@@ -10,21 +10,18 @@ import {
   Clock,
   Users,
   RefreshCw,
-  UserCheck,
   Play,
   AlertCircle,
   TrendingUp,
-  ArrowRight,
 } from 'lucide-react';
 import Sidebar from '@components/Layout/Sidebar';
 import Navbar from '@components/Layout/Navbar';
 import Card from '@components/ui/Card';
 import Badge from '@components/ui/Badge';
 import Button from '@components/ui/Button';
-import Modal from '@components/ui/Modal';
-import Input from '@components/ui/Input';
 import Loading from '@components/ui/Loading';
-import { getQueueList, takeGuest } from '@services/api';
+import TakeGuestModal from '@components/Modals/TakeGuestModal';
+import { getQueueList } from '@services/api';
 import { POLL_INTERVALS, GUEST_STATUS } from '@utils/constants';
 import { formatDateTime, formatTimeAgo } from '@utils/helpers';
 import { useAuth } from '@hooks/useAuth';
@@ -45,8 +42,6 @@ const AdminQueue = () => {
   const [lastUpdated, setLastUpdated] = useState(null);
   const [selectedGuest, setSelectedGuest] = useState(null);
   const [showTakeModal, setShowTakeModal] = useState(false);
-  const [takeLoading, setTakeLoading] = useState(false);
-  const [runnerNotes, setRunnerNotes] = useState('');
 
   // Refs
   const intervalRef = useRef(null);
@@ -95,38 +90,16 @@ const AdminQueue = () => {
   const handleTakeGuest = (guest) => {
     setSelectedGuest(guest);
     setShowTakeModal(true);
-    setRunnerNotes('');
   };
 
-  // Submit take guest
-  const submitTakeGuest = async () => {
-    // Notes are optional now, no validation required
-    try {
-      setTakeLoading(true);
+  // Handle take guest success
+  const handleTakeSuccess = async () => {
+    // Close modal
+    setShowTakeModal(false);
+    setSelectedGuest(null);
 
-      // ✅ FIXED: Correct API call - takeGuest(uid, takeData)
-      await takeGuest(selectedGuest.uid, {
-        assigned_runner: user?.email || user?.name || 'Admin',
-        runner_notes: runnerNotes.trim() || undefined, // Optional
-      });
-
-      toast.success(
-        `${selectedGuest.name} taken to table ${selectedGuest.table_number}!`
-      );
-
-      // Close modal
-      setShowTakeModal(false);
-      setSelectedGuest(null);
-      setRunnerNotes('');
-
-      // Refresh queue
-      await fetchQueue(true);
-    } catch (error) {
-      console.error('Take guest error:', error);
-      toast.error('Failed to take guest');
-    } finally {
-      setTakeLoading(false);
-    }
+    // Refresh queue
+    await fetchQueue(true);
   };
 
   // Calculate statistics
@@ -378,91 +351,16 @@ const AdminQueue = () => {
       </div>
 
       {/* Take Guest Modal */}
-      <Modal
+      <TakeGuestModal
         isOpen={showTakeModal}
         onClose={() => {
-          if (!takeLoading) {
-            setShowTakeModal(false);
-            setSelectedGuest(null);
-            setRunnerNotes('');
-          }
+          setShowTakeModal(false);
+          setSelectedGuest(null);
         }}
-        size="md"
-      >
-        <Modal.Header
-          title="Take Guest to Table"
-          subtitle={`Taking ${selectedGuest?.name} to table ${selectedGuest?.table_number}`}
-          icon={UserCheck}
-        />
-
-        <Modal.Body>
-          {selectedGuest && (
-            <>
-              {/* Guest Info */}
-              <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-12 h-12 bg-primary-600 text-white rounded-full flex items-center justify-center font-bold text-lg">
-                    {selectedGuest.name?.charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900">
-                      {selectedGuest.name}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      {selectedGuest.companion_count || 0} companion(s) • Table: {selectedGuest.table_number}
-                    </p>
-                  </div>
-                </div>
-
-                {selectedGuest.check_in_time && (
-                  <p className="text-xs text-gray-500">
-                    Waiting since: {formatDateTime(selectedGuest.check_in_time)}
-                  </p>
-                )}
-              </div>
-
-              {/* Runner Notes Input (OPTIONAL) */}
-              <div>
-                <Input
-                  label="Runner Notes (Optional)"
-                  type="textarea"
-                  placeholder="Add any notes about seating this guest... (e.g., 'Seated at table, needs high chair', 'Requested window seat', etc.)"
-                  value={runnerNotes}
-                  onChange={(e) => setRunnerNotes(e.target.value)}
-                  rows={3}
-                  disabled={takeLoading}
-                />
-                <p className="text-xs text-gray-500 mt-2">
-                  💡 Optional: Add any relevant notes about seating this guest
-                </p>
-              </div>
-            </>
-          )}
-        </Modal.Body>
-
-        <Modal.Footer>
-          <Button
-            variant="outline"
-            onClick={() => {
-              setShowTakeModal(false);
-              setSelectedGuest(null);
-              setRunnerNotes('');
-            }}
-            disabled={takeLoading}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="primary"
-            onClick={submitTakeGuest}
-            loading={takeLoading}
-            disabled={takeLoading}
-            leftIcon={!takeLoading && <ArrowRight className="w-5 h-5" />}
-          >
-            {takeLoading ? 'Taking Guest...' : 'Take to Table'}
-          </Button>
-        </Modal.Footer>
-      </Modal>
+        guest={selectedGuest}
+        onSuccess={handleTakeSuccess}
+        assignedRunner={user?.email || user?.name || 'Admin'}
+      />
     </div>
   );
 };
