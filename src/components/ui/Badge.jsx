@@ -82,29 +82,24 @@ const Badge = ({
  */
 export const StatusBadge = ({ status, ...props }) => {
   const statusConfig = {
-    [GUEST_STATUS.WAITING]: {
-      variant: 'warning',
-      label: 'Waiting',
-      dot: true,
-    },
-    [GUEST_STATUS.CHECKED_IN]: {
-      variant: 'success',
-      label: 'Checked In',
-      dot: true,
-    },
-    [GUEST_STATUS.TAKEN]: {
-      variant: 'info',
-      label: 'Taken',
-      dot: true,
-    },
-    [GUEST_STATUS.COMPLETED]: {
+    [GUEST_STATUS.NOT_ARRIVED]: {
       variant: 'default',
+      label: 'Not Arrived',
+      dot: true,
+    },
+    [GUEST_STATUS.QUEUE]: {
+      variant: 'warning',
+      label: 'In Queue',
+      dot: true,
+    },
+    [GUEST_STATUS.DONE]: {
+      variant: 'success',
       label: 'Completed',
       dot: false,
     },
   };
 
-  const config = statusConfig[status] || statusConfig[GUEST_STATUS.WAITING];
+  const config = statusConfig[status] || statusConfig[GUEST_STATUS.NOT_ARRIVED];
 
   return (
     <Badge

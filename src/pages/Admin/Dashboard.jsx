@@ -68,9 +68,9 @@ const AdminDashboard = () => {
       // Calculate statistics
       const statistics = {
         total: guests.length,
-        checkedIn: guests.filter((g) => g.status === GUEST_STATUS.CHECKED_IN).length,
-        waiting: guests.filter((g) => g.status === GUEST_STATUS.WAITING).length,
-        completed: guests.filter((g) => g.status === GUEST_STATUS.COMPLETED).length,
+        checkedIn: guests.filter((g) => g.check_in_status === GUEST_STATUS.QUEUE).length,
+        waiting: guests.filter((g) => g.check_in_status === GUEST_STATUS.NOT_ARRIVED).length,
+        completed: guests.filter((g) => g.check_in_status === GUEST_STATUS.DONE).length,
       };
 
       setStats(statistics);
@@ -290,11 +290,11 @@ const AdminDashboard = () => {
                                   {guest.name}
                                 </p>
                                 <p className="text-sm text-gray-500">
-                                  {guest.phone || 'No phone'}
+                                  {guest.table_number || 'No table'}
                                 </p>
                               </div>
                             </div>
-                            <Badge.Status status={guest.status} />
+                            <Badge.Status status={guest.check_in_status} />
                           </div>
                         ))}
                       </div>
