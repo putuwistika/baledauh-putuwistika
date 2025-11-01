@@ -32,4 +32,12 @@ export default defineConfig({
       },
     },
   },
+
+  // ===== Tambahan untuk produksi via Vite preview =====
+  preview: {
+    host: true,                        // bind 0.0.0.0 agar bisa diakses dari luar container
+    port: 1281,                        // konsisten dengan Docker/Caddy
+    allowedHosts: ['ruangtamu.putuwistika.com'], // izinkan host dari reverse proxy
+    strictPort: true,                  // jangan pindah ke port lain kalau 1281 dipakai
+  },
 })
