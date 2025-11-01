@@ -1,13 +1,13 @@
 /**
  * 🎊 RuangTamu - Wedding Check-in System
- * API Service Layer (UPDATED DOMAIN!)
+ * API Service Layer (UPDATED WITH CHECK-IN DATA!)
  * by PutuWistika
  */
 
 import axios from 'axios';
 
 // ============================================
-// CONFIGURATION - NEW DOMAIN!
+// CONFIGURATION
 // ============================================
 
 const BASE_URL = 'https://servern8n.putuwistika.com';
@@ -39,6 +39,7 @@ api.interceptors.request.use(
       method: config.method?.toUpperCase(),
       url: config.url,
       fullURL: `${config.baseURL}${config.url}`,
+      data: config.data,
     });
 
     const token = localStorage.getItem('auth_token');
@@ -199,21 +200,74 @@ export const createGuest = async (guestData) => {
 };
 
 /**
- * Check-in guest
+ * Check-in guest (UPDATED WITH OPTIONAL DATA!)
  * Endpoint: POST /webhook/check-in-guest
+ * 
+ * @param {string} uid - Guest UID (required)
+ * @param {object} checkInData - Optional check-in data
+ * @param {number} checkInData.companion_count - Number of companions
+ * @param {string} checkInData.gift_type - Type of gift (Angpao, Gift, Flowers, etc)
+ * @param {string} checkInData.gift_notes - Notes about the gift
+ * 
+ * @returns {Promise} Response with guest data and check-in status
+ * 
+ * Response Success (200):
+ * {
+ *   "_error": false,
+ *   "success": true,
+ *   "message": "GUEST CHECK-IN SUCCESS",
+ *   "statusCode": 200,
+ *   "guest": { ...complete guest data with QR code... }
+ * }
+ * 
+ * Response Already Checked In (400):
+ * {
+ *   "_error": true,
+ *   "success": false,
+ *   "message": "Guest already checked in",
+ *   "guest": { ...existing guest data... },
+ *   "statusCode": 400
+ * }
+ * 
+ * Response Not Found (404):
+ * {
+ *   "_error": true,
+ *   "success": false,
+ *   "message": "Guest not found",
+ *   "statusCode": 404
+ * }
  */
-export const checkInGuest = async (uid, checkInData) => {
+export const checkInGuest = async (uid, checkInData = {}) => {
   try {
     console.log('🎫 Checking in guest:', { uid, checkInData });
     
-    const response = await api.post('/webhook/check-in-guest', {
+    // Prepare payload
+    const payload = {
       uid,
       ...checkInData,
+    };
+
+    // Remove undefined/null values
+    Object.keys(payload).forEach(key => {
+      if (payload[key] === undefined || payload[key] === null) {
+        delete payload[key];
+      }
     });
     
+    const response = await api.post('/webhook/check-in-guest', payload);
+    
     console.log('✅ Check-in response:', response);
-    return response;
+    
+    // Return response with proper structure
+    return {
+      success: response.success || !response._error,
+      message: response.message,
+      statusCode: response.statusCode,
+      guest: response.guest,
+      _error: response._error,
+    };
   } catch (error) {
+    console.error('❌ Check-in error:', error);
     throw error;
   }
 };
@@ -222,13 +276,13 @@ export const checkInGuest = async (uid, checkInData) => {
  * Take guest from queue (Runner)
  * Endpoint: POST /webhook/take-guest
  */
-export const takeGuest = async (uid, takeData) => {
+export const takeGuest = async (uid, tableNumber) => {
   try {
-    console.log('🚀 Taking guest to table:', { uid, takeData });
+    console.log('🚀 Taking guest to table:', { uid, tableNumber });
     
     const response = await api.post('/webhook/take-guest', {
       uid,
-      ...takeData,
+      table_number: tableNumber,
     });
     
     console.log('✅ Take guest response:', response);

@@ -1,6 +1,6 @@
 /**
  * 🎊 RuangTamu - Wedding Check-in System
- * Search Guest Page - Find guests with fuzzy search
+ * Search Guest Page - Find guests with fuzzy search (UPDATED WITH CHECKIN MODAL!)
  * by PutuWistika
  */
 
@@ -13,6 +13,7 @@ import {
   Gift,
   Clock,
   X,
+  Users,
 } from 'lucide-react';
 import Sidebar from '@components/Layout/Sidebar';
 import Navbar from '@components/Layout/Navbar';
@@ -20,8 +21,8 @@ import Card from '@components/ui/Card';
 import Badge from '@components/ui/Badge';
 import Button from '@components/ui/Button';
 import Input from '@components/ui/Input';
-import Loading from '@components/ui/Loading';
-import { searchGuests, checkInGuest } from '@services/api';
+import CheckInModal from '@components/Modals/CheckInModal';
+import { searchGuests } from '@services/api';
 import { GUEST_STATUS } from '@utils/constants';
 import { formatCurrency, formatDateTime } from '@utils/helpers';
 import { toast } from 'sonner';
@@ -35,8 +36,11 @@ const SearchGuest = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [selectedGuest, setSelectedGuest] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [searching, setSearching] = useState(false);
+
+  // Modal state
+  const [showCheckInModal, setShowCheckInModal] = useState(false);
+  const [guestToCheckIn, setGuestToCheckIn] = useState(null);
 
   // Handle search
   const handleSearch = async (e) => {
@@ -67,30 +71,27 @@ const SearchGuest = () => {
     }
   };
 
-  // Handle check-in
-  const handleCheckIn = async (guest) => {
-    if (guest.status !== GUEST_STATUS.WAITING) {
-      toast.error('Guest is already checked in');
-      return;
-    }
+  // Handle open check-in modal
+  const handleOpenCheckIn = (guest) => {
+    setGuestToCheckIn(guest);
+    setShowCheckInModal(true);
+  };
 
+  // Handle check-in success
+  const handleCheckInSuccess = async (updatedGuest) => {
+    console.log('✅ Check-in successful:', updatedGuest);
+
+    // Refresh search results
     try {
-      setLoading(true);
-      await checkInGuest(guest.uid);
-      
-      toast.success(`${guest.name} checked in successfully!`);
-      
-      // Refresh search results
       const response = await searchGuests(searchQuery);
       setSearchResults(response.data || []);
-      
-      // Close detail view
-      setSelectedGuest(null);
     } catch (error) {
-      console.error('Check-in error:', error);
-      toast.error('Failed to check in guest');
-    } finally {
-      setLoading(false);
+      console.error('Error refreshing results:', error);
+    }
+
+    // Close detail view if open
+    if (selectedGuest?.uid === updatedGuest.uid) {
+      setSelectedGuest(null);
     }
   };
 
@@ -224,39 +225,41 @@ const SearchGuest = () => {
                                 {guest.name}
                               </h3>
                               <p className="text-sm text-gray-500">
-                                {guest.pax} pax
+                                {guest.companion_count || 0} companions
                               </p>
                             </div>
                           </div>
-                          <Badge.Status status={guest.status} />
+                          <Badge.Status status={guest.check_in_status} />
                         </div>
 
                         {/* Guest Info */}
                         <div className="space-y-2">
-                          {guest.phone && (
+                          {guest.table_number && (
                             <div className="flex items-center gap-2 text-sm text-gray-600">
                               <Phone className="w-4 h-4 flex-shrink-0" />
-                              <span>{guest.phone}</span>
+                              <span>{guest.table_number}</span>
                             </div>
                           )}
 
-                          {guest.angpao && (
+                          {guest.gift_type && (
                             <div className="flex items-center gap-2 text-sm text-gray-600">
                               <Gift className="w-4 h-4 flex-shrink-0" />
-                              <span>{formatCurrency(guest.angpao)}</span>
+                              <span>{guest.gift_type}</span>
                             </div>
                           )}
 
-                          {guest.checkInTime && (
+                          {guest.check_in_time && (
                             <div className="flex items-center gap-2 text-sm text-gray-600">
                               <Clock className="w-4 h-4 flex-shrink-0" />
-                              <span>{formatDateTime(guest.checkInTime)}</span>
+                              <span className="truncate">
+                                {formatDateTime(guest.check_in_time)}
+                              </span>
                             </div>
                           )}
                         </div>
 
                         {/* Quick Action */}
-                        {guest.status === GUEST_STATUS.WAITING && (
+                        {guest.check_in_status === GUEST_STATUS.NOT_ARRIVED && (
                           <div className="mt-4 pt-4 border-t border-gray-200">
                             <Button
                               variant="primary"
@@ -265,10 +268,8 @@ const SearchGuest = () => {
                               leftIcon={<UserCheck className="w-4 h-4" />}
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleCheckIn(guest);
+                                handleOpenCheckIn(guest);
                               }}
-                              loading={loading}
-                              disabled={loading}
                             >
                               Check In
                             </Button>
@@ -326,7 +327,7 @@ const SearchGuest = () => {
         </main>
       </div>
 
-      {/* Guest Detail Modal (Optional - can be enhanced later) */}
+      {/* Guest Detail Modal (Simple View) */}
       {selectedGuest && (
         <div
           className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
@@ -354,41 +355,41 @@ const SearchGuest = () => {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">
                 {selectedGuest.name}
               </h2>
-              <Badge.Status status={selectedGuest.status} />
+              <Badge.Status status={selectedGuest.check_in_status} />
             </div>
 
             {/* Details */}
             <div className="space-y-3 mb-6">
-              {selectedGuest.phone && (
+              {selectedGuest.table_number && (
                 <div className="flex items-center justify-between py-2 border-b border-gray-100">
                   <span className="text-sm text-gray-600">Phone</span>
                   <span className="font-medium text-gray-900">
-                    {selectedGuest.phone}
+                    {selectedGuest.table_number}
                   </span>
                 </div>
               )}
 
               <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                <span className="text-sm text-gray-600">Pax</span>
+                <span className="text-sm text-gray-600">Companions</span>
                 <span className="font-medium text-gray-900">
-                  {selectedGuest.pax}
+                  {selectedGuest.companion_count || 0}
                 </span>
               </div>
 
-              {selectedGuest.angpao && (
+              {selectedGuest.gift_type && (
                 <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                  <span className="text-sm text-gray-600">Angpao</span>
+                  <span className="text-sm text-gray-600">Gift Type</span>
                   <span className="font-medium text-gray-900">
-                    {formatCurrency(selectedGuest.angpao)}
+                    {selectedGuest.gift_type}
                   </span>
                 </div>
               )}
 
-              {selectedGuest.checkInTime && (
+              {selectedGuest.check_in_time && (
                 <div className="flex items-center justify-between py-2 border-b border-gray-100">
                   <span className="text-sm text-gray-600">Check-in Time</span>
-                  <span className="font-medium text-gray-900">
-                    {formatDateTime(selectedGuest.checkInTime)}
+                  <span className="font-medium text-gray-900 text-xs">
+                    {formatDateTime(selectedGuest.check_in_time)}
                   </span>
                 </div>
               )}
@@ -403,14 +404,15 @@ const SearchGuest = () => {
               >
                 Close
               </Button>
-              {selectedGuest.status === GUEST_STATUS.WAITING && (
+              {selectedGuest.check_in_status === GUEST_STATUS.NOT_ARRIVED && (
                 <Button
                   variant="primary"
                   fullWidth
                   leftIcon={<UserCheck className="w-5 h-5" />}
-                  onClick={() => handleCheckIn(selectedGuest)}
-                  loading={loading}
-                  disabled={loading}
+                  onClick={() => {
+                    handleOpenCheckIn(selectedGuest);
+                    setSelectedGuest(null);
+                  }}
                 >
                   Check In
                 </Button>
@@ -419,6 +421,17 @@ const SearchGuest = () => {
           </motion.div>
         </div>
       )}
+
+      {/* Check-In Modal */}
+      <CheckInModal
+        isOpen={showCheckInModal}
+        onClose={() => {
+          setShowCheckInModal(false);
+          setGuestToCheckIn(null);
+        }}
+        guest={guestToCheckIn}
+        onSuccess={handleCheckInSuccess}
+      />
     </div>
   );
 };

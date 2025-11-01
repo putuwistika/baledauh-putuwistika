@@ -1,6 +1,6 @@
 /**
  * 🎊 RuangTamu - Wedding Check-in System
- * Helper Functions & Utilities (COMPLETE & FIXED!)
+ * Helper Functions & Utilities (UPDATED WITH QR CODE!)
  * by PutuWistika
  */
 
@@ -31,7 +31,7 @@ export const formatDate = (date, formatStr = DATE_FORMATS.FULL) => {
 };
 
 /**
- * Format date time dengan format lengkap (NEW!)
+ * Format date time dengan format lengkap
  * @param {string|Date} date - Date to format
  * @returns {string} Formatted date time
  */
@@ -57,7 +57,7 @@ export const formatDateTime = (date) => {
 };
 
 /**
- * Format time ago (relative time) (NEW!)
+ * Format time ago (relative time)
  * @param {string|Date} date - Date to format
  * @returns {string} Time ago string
  */
@@ -381,7 +381,7 @@ export const isValidName = (name) => {
 };
 
 /**
- * Validate Indonesian phone number (NEW!)
+ * Validate Indonesian phone number
  * @param {string} phone - Phone number to validate
  * @returns {boolean} Is valid
  */
@@ -434,7 +434,7 @@ export const validateRequiredFields = (obj, requiredFields) => {
  * @returns {boolean} True if checked in
  */
 export const isGuestCheckedIn = (guest) => {
-  return guest?.is_checked_in === true;
+  return guest?.is_checked_in === true || guest?.is_checked_in === 'TRUE';
 };
 
 /**
@@ -481,6 +481,152 @@ export const getGuestDisplayName = (guest) => {
 export const countTotalCompanions = (guests) => {
   if (!Array.isArray(guests)) return 0;
   return guests.reduce((sum, guest) => sum + (guest.companion_count || 0), 0);
+};
+
+// ============================================
+// QR Code Helpers (NEW!)
+// ============================================
+
+/**
+ * Generate QR code URL for guest
+ * Uses api.qrserver.com to generate QR code image
+ * QR code contains link to guest card page
+ * 
+ * @param {string} uid - Guest UID
+ * @param {string} size - Size option (small|medium|large)
+ * @returns {string} QR code image URL
+ * 
+ * @example
+ * generateGuestQRCode('g_abc123', 'medium')
+ * // Returns: https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://yourapp.com/guest/g_abc123
+ */
+export const generateGuestQRCode = (uid, size = 'medium') => {
+  if (!uid) {
+    console.error('UID is required to generate QR code');
+    return '';
+  }
+
+  // Size mapping
+  const sizeMap = {
+    small: '150x150',
+    medium: '300x300',
+    large: '500x500',
+    xlarge: '1000x1000',
+  };
+  
+  const qrSize = sizeMap[size] || sizeMap.medium;
+  
+  // Data will be the URL to guest card page
+  const data = getGuestCardURL(uid);
+  
+  // Build QR code URL with parameters
+  const params = new URLSearchParams({
+    size: qrSize,
+    data: data,
+    margin: '1',
+    format: 'png',
+  });
+  
+  // Generate QR code URL
+  return `https://api.qrserver.com/v1/create-qr-code/?${params.toString()}`;
+};
+
+/**
+ * Get guest card URL
+ * Returns the URL to the guest's public profile card page
+ * 
+ * @param {string} uid - Guest UID
+ * @returns {string} Guest card page URL
+ * 
+ * @example
+ * getGuestCardURL('g_abc123')
+ * // Returns: https://yourapp.com/guest/g_abc123
+ */
+export const getGuestCardURL = (uid) => {
+  if (!uid) {
+    console.error('UID is required to generate guest card URL');
+    return '';
+  }
+
+  // Get current origin (works in both dev and production)
+  const origin = typeof window !== 'undefined' 
+    ? window.location.origin 
+    : 'https://ruangtamu.putuwistika.com';
+  
+  return `${origin}/guest/${uid}`;
+};
+
+/**
+ * Download QR code image
+ * Fetches QR code and triggers download
+ * 
+ * @param {string} uid - Guest UID
+ * @param {string} guestName - Guest name (for filename)
+ * @param {string} size - QR size (small|medium|large)
+ * @returns {Promise<boolean>} Success status
+ * 
+ * @example
+ * await downloadGuestQRCode('g_abc123', 'John Doe', 'medium')
+ */
+export const downloadGuestQRCode = async (uid, guestName, size = 'medium') => {
+  try {
+    const qrUrl = generateGuestQRCode(uid, size);
+    
+    // Fetch QR code image
+    const response = await fetch(qrUrl);
+    if (!response.ok) throw new Error('Failed to fetch QR code');
+    
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    
+    // Create download link
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `qr-${uid}-${guestName.replace(/\s+/g, '-')}.png`;
+    
+    // Trigger download
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Cleanup
+    window.URL.revokeObjectURL(url);
+    
+    return true;
+  } catch (error) {
+    console.error('Error downloading QR code:', error);
+    return false;
+  }
+};
+
+/**
+ * Share guest card URL
+ * Copies guest card URL to clipboard or opens share dialog
+ * 
+ * @param {string} uid - Guest UID
+ * @returns {Promise<boolean>} Success status
+ */
+export const shareGuestCard = async (uid) => {
+  const url = getGuestCardURL(uid);
+  
+  try {
+    // Try native share API first (mobile)
+    if (navigator.share) {
+      await navigator.share({
+        title: 'Guest Card',
+        text: 'View guest information',
+        url: url,
+      });
+      return true;
+    }
+    
+    // Fallback: copy to clipboard
+    await navigator.clipboard.writeText(url);
+    return true;
+  } catch (error) {
+    console.error('Error sharing guest card:', error);
+    return false;
+  }
 };
 
 // ============================================
@@ -692,11 +838,11 @@ export const copyToClipboard = async (text) => {
 };
 
 // ============================================
-// UI/Style Helper Functions (NEW!)
+// UI/Style Helper Functions
 // ============================================
 
 /**
- * Conditional className utility (cn) (NEW!)
+ * Conditional className utility (cn)
  * Combines class names conditionally
  * @param {...any} classes - Class names to combine
  * @returns {string} Combined class names
@@ -710,7 +856,7 @@ export const cn = (...classes) => {
 };
 
 /**
- * Generate random color (for avatars, etc) (NEW!)
+ * Generate random color (for avatars, etc)
  * @returns {string} Random color class
  */
 export const getRandomColor = () => {
@@ -728,7 +874,7 @@ export const getRandomColor = () => {
 };
 
 /**
- * Get color based on status (NEW!)
+ * Get color based on status
  * @param {string} status - Guest status
  * @returns {string} Color class
  */
@@ -744,7 +890,7 @@ export const getStatusColor = (status) => {
 };
 
 /**
- * Clamp number between min and max (NEW!)
+ * Clamp number between min and max
  * @param {number} value - Value to clamp
  * @param {number} min - Minimum value
  * @param {number} max - Maximum value
@@ -805,6 +951,12 @@ export default {
   isGuestCompleted,
   getGuestDisplayName,
   countTotalCompanions,
+  
+  // QR Code (NEW!)
+  generateGuestQRCode,
+  getGuestCardURL,
+  downloadGuestQRCode,
+  shareGuestCard,
   
   // Permission
   hasPermission,

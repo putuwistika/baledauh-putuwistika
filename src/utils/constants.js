@@ -1,6 +1,6 @@
 /**
  * 🎊 RuangTamu - Wedding Check-in System
- * Constants & Configuration
+ * Constants & Configuration (UPDATED WITH QR CODE!)
  * by PutuWistika
  */
 
@@ -12,26 +12,26 @@
  * Base URL untuk API n8n
  * @type {string}
  */
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://n8n.srv1095171.hstgr.cloud';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://servern8n.putuwistika.com';
 
 /**
  * API Endpoints
  * Berdasarkan dokumentasi WEDDING_API_COMPLETE_DOCUMENTATION.md
  */
 export const API_ENDPOINTS = {
-  // ðŸ” Authentication
+  // 🔐 Authentication
   LOGIN: '/webhook/auth/login',
   
-  // ðŸ‘¥ Guest Management
+  // 👥 Guest Management
   GET_GUEST: '/webhook/1d3229bc-af4b-4a6b-bef1-b16b8760a05f/get-guest', // + /:uid
   SEARCH_GUESTS: '/webhook/search-guests',
   CREATE_GUEST: '/webhook/create-guest',
   GET_ALL_GUESTS: '/webhook/get-guests', // optional ?status=queue|done|not_arrived
   
-  // âœ… Check-in
+  // ✅ Check-in
   CHECK_IN_GUEST: '/webhook/check-in-guest',
   
-  // ðŸƒ Runner
+  // 🏃 Runner
   TAKE_GUEST: '/webhook/take-guest',
   GET_QUEUE: '/webhook/get-queue',
   RUNNER_COMPLETED: '/webhook/99572f92-6c4f-486b-b4e4-dd5df671e866/runner-completed', // + /:runnerId
@@ -158,6 +158,92 @@ export const GIFT_TYPES = [
 ];
 
 // ============================================
+// QR Code Configuration (NEW!)
+// ============================================
+
+/**
+ * QR Code Server Configuration
+ * Using https://api.qrserver.com for QR generation
+ * 
+ * QR Code will contain URL to guest card page
+ * Format: {BASE_APP_URL}/guest/{uid}
+ */
+export const QR_CODE_CONFIG = {
+  // Base URL for QR generation API
+  BASE_URL: 'https://api.qrserver.com/v1/create-qr-code/',
+  
+  // Size options (width x height in pixels)
+  SIZES: {
+    SMALL: '150x150',
+    MEDIUM: '300x300',
+    LARGE: '500x500',
+    XLARGE: '1000x1000',
+  },
+  
+  // Default size for QR code generation
+  DEFAULT_SIZE: '300x300',
+  
+  // Error correction level
+  // L = Low (7% of data bytes can be restored)
+  // M = Medium (15% of data bytes can be restored) - DEFAULT
+  // Q = Quartile (25% of data bytes can be restored)
+  // H = High (30% of data bytes can be restored)
+  ERROR_CORRECTION: 'M',
+  
+  // Default margin (quiet zone) around QR code
+  MARGIN: 1,
+  
+  // Image format
+  FORMAT: 'png',
+};
+
+/**
+ * Generate QR Code URL for guest
+ * @param {string} uid - Guest UID
+ * @param {string} size - Size option (SMALL, MEDIUM, LARGE, XLARGE)
+ * @returns {string} Complete QR code image URL
+ * 
+ * @example
+ * getQRCodeURL('g_abc123', 'MEDIUM')
+ * // Returns: https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://yourapp.com/guest/g_abc123
+ */
+export const getQRCodeURL = (uid, size = 'MEDIUM') => {
+  // Get size from config
+  const qrSize = QR_CODE_CONFIG.SIZES[size] || QR_CODE_CONFIG.DEFAULT_SIZE;
+  
+  // Generate data URL (guest card page)
+  const data = getGuestCardURL(uid);
+  
+  // Build QR code URL with parameters
+  const params = new URLSearchParams({
+    size: qrSize,
+    data: data,
+    margin: QR_CODE_CONFIG.MARGIN,
+    format: QR_CODE_CONFIG.FORMAT,
+  });
+  
+  return `${QR_CODE_CONFIG.BASE_URL}?${params.toString()}`;
+};
+
+/**
+ * Get guest card URL
+ * @param {string} uid - Guest UID
+ * @returns {string} Guest card page URL
+ * 
+ * @example
+ * getGuestCardURL('g_abc123')
+ * // Returns: https://yourapp.com/guest/g_abc123
+ */
+export const getGuestCardURL = (uid) => {
+  // Get current origin (works in both dev and production)
+  const origin = typeof window !== 'undefined' 
+    ? window.location.origin 
+    : 'https://ruangtamu.putuwistika.com';
+  
+  return `${origin}/guest/${uid}`;
+};
+
+// ============================================
 // Routes
 // ============================================
 
@@ -170,27 +256,26 @@ export const ROUTES = {
   // Admin Routes
   ADMIN_DASHBOARD: '/admin/dashboard',
   ADMIN_SEARCH: '/admin/search',
-  ADMIN_CREATE_GUEST: '/admin/create',  // ← Updated from ADMIN_CREATE
+  ADMIN_CREATE_GUEST: '/admin/create',
   ADMIN_ALL_GUESTS: '/admin/guests',
   ADMIN_QUEUE: '/admin/queue',
   
   // Runner Routes
   RUNNER_DASHBOARD: '/runner/dashboard',
   RUNNER_QUEUE: '/runner/queue',
-  RUNNER_MY_GUESTS: '/runner/completed',  // ← Updated from RUNNER_COMPLETED
+  RUNNER_MY_GUESTS: '/runner/completed',
 };
 
 export const ROUTE_LABELS = {
   [ROUTES.ADMIN_DASHBOARD]: 'Dashboard',
   [ROUTES.ADMIN_SEARCH]: 'Search Guest',
-  [ROUTES.ADMIN_CREATE_GUEST]: 'Create Guest',  // ← Updated
+  [ROUTES.ADMIN_CREATE_GUEST]: 'Create Guest',
   [ROUTES.ADMIN_ALL_GUESTS]: 'All Guests',
   [ROUTES.ADMIN_QUEUE]: 'Queue',
   [ROUTES.RUNNER_DASHBOARD]: 'Dashboard',
   [ROUTES.RUNNER_QUEUE]: 'Queue',
-  [ROUTES.RUNNER_MY_GUESTS]: 'My Guests',  // ← Updated
+  [ROUTES.RUNNER_MY_GUESTS]: 'My Guests',
 };
-
 
 // ============================================
 // Animation Settings
@@ -231,6 +316,7 @@ export const SUCCESS_MESSAGES = {
   GUEST_CREATED: 'Guest created successfully!',
   GUEST_CHECKED_IN: 'Guest checked in successfully!',
   GUEST_TAKEN: 'Guest taken to table successfully!',
+  QR_DOWNLOADED: 'QR Code downloaded successfully!',
 };
 
 export const ERROR_MESSAGES = {
@@ -240,6 +326,7 @@ export const ERROR_MESSAGES = {
   ALREADY_CHECKED_IN: 'Guest already checked in.',
   INVALID_INPUT: 'Please fill in all required fields.',
   UNKNOWN_ERROR: 'An error occurred. Please try again.',
+  QR_GENERATION_FAILED: 'Failed to generate QR code.',
 };
 
 // ============================================
@@ -260,6 +347,10 @@ export const VALIDATION = {
     MAX_LENGTH: 100,
     MESSAGE: 'Name must be between 2-100 characters',
   },
+  PHONE: {
+    PATTERN: /^(\+62|62|0)[0-9]{9,12}$/,
+    MESSAGE: 'Please enter a valid Indonesian phone number',
+  },
   UID: {
     PATTERN: /^[a-zA-Z0-9_-]+$/,
     MESSAGE: 'UID can only contain letters, numbers, dashes and underscores',
@@ -272,6 +363,8 @@ export const VALIDATION = {
 
 export const LOTTIE_ANIMATIONS = {
   HERO: 'https://lottie.host/3794cb22-a094-4229-9a7d-8e7b70c56683/kL0wXsVqAN.lottie',
+  SUCCESS: 'https://lottie.host/embed/success.json',
+  LOADING: 'https://lottie.host/embed/loading.json',
 };
 
 // ============================================
@@ -299,6 +392,10 @@ export const DATE_FORMATS = {
   ISO: "yyyy-MM-dd'T'HH:mm:ss'Z'",
 };
 
+// ============================================
+// Export All (DEFAULT)
+// ============================================
+
 export default {
   API_BASE_URL,
   API_ENDPOINTS,
@@ -317,6 +414,9 @@ export default {
   INVITATION_TYPES,
   INVITATION_COLORS,
   GIFT_TYPES,
+  QR_CODE_CONFIG,
+  getQRCodeURL,
+  getGuestCardURL,
   ROUTES,
   ROUTE_LABELS,
   ANIMATION_VARIANTS,

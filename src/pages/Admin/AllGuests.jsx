@@ -1,6 +1,6 @@
 /**
  * 🎊 RuangTamu - Wedding Check-in System
- * All Guests Page - View and manage all guests
+ * All Guests Page - View and manage all guests (UPDATED WITH CHECKIN MODAL!)
  * by PutuWistika
  */
 
@@ -21,7 +21,8 @@ import Card from '@components/ui/Card';
 import Badge from '@components/ui/Badge';
 import Button from '@components/ui/Button';
 import Table from '@components/ui/Table';
-import { getAllGuests, checkInGuest } from '@services/api';
+import CheckInModal from '@components/Modals/CheckInModal';
+import { getAllGuests } from '@services/api';
 import { ROUTES, GUEST_STATUS } from '@utils/constants';
 import { formatCurrency, formatDateTime } from '@utils/helpers';
 import { toast } from 'sonner';
@@ -37,10 +38,13 @@ const AllGuests = () => {
   const [guests, setGuests] = useState([]);
   const [filteredGuests, setFilteredGuests] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Modal state
+  const [showCheckInModal, setShowCheckInModal] = useState(false);
+  const [guestToCheckIn, setGuestToCheckIn] = useState(null);
 
   // Fetch guests
   useEffect(() => {
@@ -56,7 +60,7 @@ const AllGuests = () => {
       const filtered = guests.filter(
         (guest) =>
           guest.name?.toLowerCase().includes(query) ||
-          guest.phone?.toLowerCase().includes(query) ||
+          guest.table_number?.toLowerCase().includes(query) ||
           guest.uid?.toLowerCase().includes(query)
       );
       setFilteredGuests(filtered);
@@ -82,27 +86,18 @@ const AllGuests = () => {
     }
   };
 
-  // Handle check-in
-  const handleCheckIn = async (guest) => {
-    if (guest.status !== GUEST_STATUS.WAITING) {
-      toast.error('Guest is already checked in');
-      return;
-    }
+  // Handle open check-in modal
+  const handleOpenCheckIn = (guest) => {
+    setGuestToCheckIn(guest);
+    setShowCheckInModal(true);
+  };
 
-    try {
-      setActionLoading(true);
-      await checkInGuest(guest.uid);
-      
-      toast.success(`${guest.name} checked in successfully!`);
-      
-      // Refresh guest list
-      await fetchGuests();
-    } catch (error) {
-      console.error('Check-in error:', error);
-      toast.error('Failed to check in guest');
-    } finally {
-      setActionLoading(false);
-    }
+  // Handle check-in success
+  const handleCheckInSuccess = async (updatedGuest) => {
+    console.log('✅ Check-in successful:', updatedGuest);
+    
+    // Refresh guest list
+    await fetchGuests();
   };
 
   // Handle export (placeholder)
@@ -130,7 +125,7 @@ const AllGuests = () => {
       ),
     },
     {
-      key: 'phone',
+      key: 'table_number',
       label: 'Phone',
       sortable: true,
       render: (value) => (
@@ -140,33 +135,33 @@ const AllGuests = () => {
       ),
     },
     {
-      key: 'pax',
-      label: 'Pax',
+      key: 'companion_count',
+      label: 'Companions',
       sortable: true,
-      width: '80px',
+      width: '100px',
       render: (value) => (
-        <span className="text-sm font-medium text-gray-900">{value}</span>
+        <span className="text-sm font-medium text-gray-900">{value || 0}</span>
       ),
     },
     {
-      key: 'angpao',
-      label: 'Angpao',
+      key: 'gift_type',
+      label: 'Gift',
       sortable: true,
       render: (value) => (
         <span className="text-sm text-gray-900">
-          {value ? formatCurrency(value) : <span className="text-gray-400">-</span>}
+          {value ? value : <span className="text-gray-400">-</span>}
         </span>
       ),
     },
     {
-      key: 'status',
+      key: 'check_in_status',
       label: 'Status',
       sortable: true,
       width: '120px',
       render: (value) => <Badge.Status status={value} />,
     },
     {
-      key: 'checkInTime',
+      key: 'check_in_time',
       label: 'Check-in Time',
       sortable: true,
       render: (value) => (
@@ -179,32 +174,31 @@ const AllGuests = () => {
       key: 'actions',
       label: 'Actions',
       sortable: false,
-      width: '100px',
+      width: '140px',
       render: (_, row) => (
         <div className="flex items-center gap-2">
-          {row.status === GUEST_STATUS.WAITING && (
+          {row.check_in_status === GUEST_STATUS.NOT_ARRIVED && (
             <Button
-              variant="outline"
+              variant="primary"
               size="sm"
               leftIcon={<UserCheck className="w-4 h-4" />}
               onClick={(e) => {
                 e.stopPropagation();
-                handleCheckIn(row);
+                handleOpenCheckIn(row);
               }}
-              disabled={actionLoading}
             >
               Check In
             </Button>
           )}
-          {row.status !== GUEST_STATUS.WAITING && (
+          {row.check_in_status !== GUEST_STATUS.NOT_ARRIVED && (
             <Button
               variant="ghost"
               size="sm"
               leftIcon={<Eye className="w-4 h-4" />}
               onClick={(e) => {
                 e.stopPropagation();
-                // TODO: Show guest detail modal
-                toast.info('View detail coming soon!');
+                // Open in check-in modal (view mode)
+                handleOpenCheckIn(row);
               }}
             >
               View
@@ -225,9 +219,9 @@ const AllGuests = () => {
   // Statistics
   const stats = {
     total: guests.length,
-    checkedIn: guests.filter((g) => g.status === GUEST_STATUS.CHECKED_IN).length,
-    waiting: guests.filter((g) => g.status === GUEST_STATUS.WAITING).length,
-    completed: guests.filter((g) => g.status === GUEST_STATUS.COMPLETED).length,
+    checkedIn: guests.filter((g) => g.check_in_status === GUEST_STATUS.QUEUE).length,
+    waiting: guests.filter((g) => g.check_in_status === GUEST_STATUS.NOT_ARRIVED).length,
+    completed: guests.filter((g) => g.check_in_status === GUEST_STATUS.DONE).length,
   };
 
   return (
@@ -326,7 +320,7 @@ const AllGuests = () => {
                     <p className="text-2xl font-bold text-gray-900">
                       {stats.waiting}
                     </p>
-                    <p className="text-xs text-gray-600">Waiting</p>
+                    <p className="text-xs text-gray-600">Not Arrived</p>
                   </div>
                 </div>
               </Card>
@@ -391,6 +385,17 @@ const AllGuests = () => {
           </div>
         </main>
       </div>
+
+      {/* Check-In Modal */}
+      <CheckInModal
+        isOpen={showCheckInModal}
+        onClose={() => {
+          setShowCheckInModal(false);
+          setGuestToCheckIn(null);
+        }}
+        guest={guestToCheckIn}
+        onSuccess={handleCheckInSuccess}
+      />
     </div>
   );
 };
