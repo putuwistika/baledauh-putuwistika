@@ -1,6 +1,6 @@
 /**
  * 🎊 RuangTamu - Wedding Check-in System
- * Search Guest Page - Find guests with fuzzy search (UPDATED WITH CHECKIN MODAL!)
+ * Search Guest Page - Find guests with fuzzy search (UPDATED!)
  * by PutuWistika
  */
 
@@ -9,11 +9,11 @@ import { motion } from 'framer-motion';
 import {
   Search,
   UserCheck,
-  Phone,
-  Gift,
-  Clock,
   X,
-  Users,
+  MapPin,
+  Sparkles,
+  Eye,
+  Clock,
 } from 'lucide-react';
 import Sidebar from '@components/Layout/Sidebar';
 import Navbar from '@components/Layout/Navbar';
@@ -24,7 +24,7 @@ import Input from '@components/ui/Input';
 import CheckInModal from '@components/Modals/CheckInModal';
 import { searchGuests } from '@services/api';
 import { GUEST_STATUS } from '@utils/constants';
-import { formatCurrency, formatDateTime } from '@utils/helpers';
+import { formatDateTime } from '@utils/helpers';
 import { toast } from 'sonner';
 
 /**
@@ -176,9 +176,7 @@ const SearchGuest = () => {
                     💡 <strong>Search Tips:</strong>
                   </p>
                   <ul className="text-sm text-gray-600 space-y-1">
-                    <li>• Partial names work (e.g., "john" finds "John Doe")</li>
-                    <li>• Phone numbers can be partial or full</li>
-                    <li>• Search is case-insensitive</li>
+                    <li>• Partial names work (e.g., "feri" finds "Ferry")</li>
                     <li>• Fuzzy matching helps with typos</li>
                   </ul>
                 </div>
@@ -220,46 +218,53 @@ const SearchGuest = () => {
                             <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center font-bold text-lg">
                               {guest.name?.charAt(0).toUpperCase()}
                             </div>
-                            <div>
-                              <h3 className="font-semibold text-gray-900">
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold text-gray-900 truncate">
                                 {guest.name}
                               </h3>
-                              <p className="text-sm text-gray-500">
-                                {guest.companion_count || 0} companions
+                              <p className="text-xs text-gray-500 font-mono truncate">
+                                {guest.uid}
                               </p>
                             </div>
                           </div>
-                          <Badge.Status status={guest.check_in_status} />
+                          {/* Status Badge - from check_in_status */}
+                          <Badge.Status 
+                            status={guest.check_in_status || GUEST_STATUS.NOT_ARRIVED} 
+                          />
                         </div>
 
-                        {/* Guest Info */}
+                        {/* Guest Info - FIXED! */}
                         <div className="space-y-2">
+                          {/* Table Number */}
                           {guest.table_number && (
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                              <Phone className="w-4 h-4 flex-shrink-0" />
-                              <span>{guest.table_number}</span>
+                            <div className="flex items-center gap-2 text-sm">
+                              <div className="flex items-center gap-2 px-3 py-1.5 bg-purple-50 text-purple-700 rounded-lg border border-purple-200">
+                                <MapPin className="w-4 h-4 flex-shrink-0" />
+                                <span className="font-medium">Table {guest.table_number}</span>
+                              </div>
                             </div>
                           )}
 
-                          {guest.gift_type && (
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                              <Gift className="w-4 h-4 flex-shrink-0" />
-                              <span>{guest.gift_type}</span>
+                          {/* Invitation Type */}
+                          {guest.invitation_type && (
+                            <div className="flex items-center gap-2 text-sm">
+                              <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg border border-blue-200">
+                                <Sparkles className="w-4 h-4 flex-shrink-0" />
+                                <span className="font-medium">{guest.invitation_type}</span>
+                              </div>
                             </div>
                           )}
 
-                          {guest.check_in_time && (
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                              <Clock className="w-4 h-4 flex-shrink-0" />
-                              <span className="truncate">
-                                {formatDateTime(guest.check_in_time)}
-                              </span>
+                          {/* If no table and no invitation type, show placeholder */}
+                          {!guest.table_number && !guest.invitation_type && (
+                            <div className="text-xs text-gray-400 italic py-2">
+                              No additional info
                             </div>
                           )}
                         </div>
 
-                        {/* Quick Action */}
-                        {guest.check_in_status === GUEST_STATUS.NOT_ARRIVED && (
+                        {/* Quick Action - Only for NOT_ARRIVED */}
+                        {(guest.check_in_status === GUEST_STATUS.NOT_ARRIVED || !guest.check_in_status) && (
                           <div className="mt-4 pt-4 border-t border-gray-200">
                             <Button
                               variant="primary"
@@ -272,6 +277,24 @@ const SearchGuest = () => {
                               }}
                             >
                               Check In
+                            </Button>
+                          </div>
+                        )}
+
+                        {/* View Details - For already checked-in guests */}
+                        {guest.check_in_status && guest.check_in_status !== GUEST_STATUS.NOT_ARRIVED && (
+                          <div className="mt-4 pt-4 border-t border-gray-200">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              fullWidth
+                              leftIcon={<Eye className="w-4 h-4" />}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOpenCheckIn(guest);
+                              }}
+                            >
+                              View Details
                             </Button>
                           </div>
                         )}
@@ -336,13 +359,13 @@ const SearchGuest = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6"
+            className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
             <button
               onClick={() => setSelectedGuest(null)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -355,39 +378,59 @@ const SearchGuest = () => {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">
                 {selectedGuest.name}
               </h2>
-              <Badge.Status status={selectedGuest.check_in_status} />
+              <div className="flex items-center justify-center gap-2 flex-wrap">
+                <Badge.Status status={selectedGuest.check_in_status || GUEST_STATUS.NOT_ARRIVED} />
+                {selectedGuest.invitation_type && (
+                  <Badge variant="primary">
+                    {selectedGuest.invitation_type}
+                  </Badge>
+                )}
+              </div>
             </div>
 
             {/* Details */}
             <div className="space-y-3 mb-6">
+              {/* UID */}
+              <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                <span className="text-sm text-gray-600">UID</span>
+                <span className="font-medium text-gray-900 font-mono text-sm">
+                  {selectedGuest.uid}
+                </span>
+              </div>
+
+              {/* Table Number */}
               {selectedGuest.table_number && (
                 <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                  <span className="text-sm text-gray-600">Phone</span>
+                  <span className="text-sm text-gray-600 flex items-center gap-2">
+                    <MapPin className="w-4 h-4" />
+                    Table Number
+                  </span>
                   <span className="font-medium text-gray-900">
                     {selectedGuest.table_number}
                   </span>
                 </div>
               )}
 
-              <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                <span className="text-sm text-gray-600">Companions</span>
-                <span className="font-medium text-gray-900">
-                  {selectedGuest.companion_count || 0}
-                </span>
-              </div>
-
-              {selectedGuest.gift_type && (
+              {/* Invitation Type */}
+              {selectedGuest.invitation_type && (
                 <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                  <span className="text-sm text-gray-600">Gift Type</span>
+                  <span className="text-sm text-gray-600 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4" />
+                    Invitation Type
+                  </span>
                   <span className="font-medium text-gray-900">
-                    {selectedGuest.gift_type}
+                    {selectedGuest.invitation_type}
                   </span>
                 </div>
               )}
 
+              {/* Check-in Time */}
               {selectedGuest.check_in_time && (
                 <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                  <span className="text-sm text-gray-600">Check-in Time</span>
+                  <span className="text-sm text-gray-600 flex items-center gap-2">
+                    <Clock className="w-4 h-4" />
+                    Check-in Time
+                  </span>
                   <span className="font-medium text-gray-900 text-xs">
                     {formatDateTime(selectedGuest.check_in_time)}
                   </span>
@@ -404,7 +447,7 @@ const SearchGuest = () => {
               >
                 Close
               </Button>
-              {selectedGuest.check_in_status === GUEST_STATUS.NOT_ARRIVED && (
+              {(selectedGuest.check_in_status === GUEST_STATUS.NOT_ARRIVED || !selectedGuest.check_in_status) && (
                 <Button
                   variant="primary"
                   fullWidth
@@ -415,6 +458,19 @@ const SearchGuest = () => {
                   }}
                 >
                   Check In
+                </Button>
+              )}
+              {selectedGuest.check_in_status && selectedGuest.check_in_status !== GUEST_STATUS.NOT_ARRIVED && (
+                <Button
+                  variant="primary"
+                  fullWidth
+                  leftIcon={<Eye className="w-5 h-5" />}
+                  onClick={() => {
+                    handleOpenCheckIn(selectedGuest);
+                    setSelectedGuest(null);
+                  }}
+                >
+                  View Details
                 </Button>
               )}
             </div>

@@ -27,6 +27,7 @@ import Loading from '@components/ui/Loading';
 import { getQueueList, takeGuest } from '@services/api';
 import { POLL_INTERVALS, GUEST_STATUS } from '@utils/constants';
 import { formatDateTime, formatTimeAgo } from '@utils/helpers';
+import { useAuth } from '@hooks/useAuth';
 import { toast } from 'sonner';
 
 /**
@@ -34,6 +35,9 @@ import { toast } from 'sonner';
  * Real-time queue monitoring and guest management
  */
 const AdminQueue = () => {
+  // Auth
+  const { user } = useAuth();
+
   // State
   const [queue, setQueue] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -42,7 +46,7 @@ const AdminQueue = () => {
   const [selectedGuest, setSelectedGuest] = useState(null);
   const [showTakeModal, setShowTakeModal] = useState(false);
   const [takeLoading, setTakeLoading] = useState(false);
-  const [tableNumber, setTableNumber] = useState('');
+  const [runnerNotes, setRunnerNotes] = useState('');
 
   // Refs
   const intervalRef = useRef(null);
@@ -91,29 +95,29 @@ const AdminQueue = () => {
   const handleTakeGuest = (guest) => {
     setSelectedGuest(guest);
     setShowTakeModal(true);
-    setTableNumber('');
+    setRunnerNotes('');
   };
 
   // Submit take guest
   const submitTakeGuest = async () => {
-    if (!tableNumber || !tableNumber.trim()) {
-      toast.error('Please enter table number');
-      return;
-    }
-
+    // Notes are optional now, no validation required
     try {
       setTakeLoading(true);
 
-      await takeGuest(selectedGuest.uid, tableNumber.trim());
+      // ✅ FIXED: Correct API call - takeGuest(uid, takeData)
+      await takeGuest(selectedGuest.uid, {
+        assigned_runner: user?.email || user?.name || 'Admin',
+        runner_notes: runnerNotes.trim() || undefined, // Optional
+      });
 
       toast.success(
-        `${selectedGuest.name} taken to table ${tableNumber}!`
+        `${selectedGuest.name} taken to table ${selectedGuest.table_number}!`
       );
 
       // Close modal
       setShowTakeModal(false);
       setSelectedGuest(null);
-      setTableNumber('');
+      setRunnerNotes('');
 
       // Refresh queue
       await fetchQueue(true);
@@ -128,7 +132,7 @@ const AdminQueue = () => {
   // Calculate statistics
   const stats = {
     total: queue.length,
-    waiting: queue.filter((g) => g.status === GUEST_STATUS.CHECKED_IN).length,
+    waiting: queue.filter((g) => g.check_in_status === 'queue').length,
     avgWaitTime: queue.length > 0 ? '5 min' : '-', // Mock data
   };
 
@@ -303,10 +307,10 @@ const AdminQueue = () => {
                                     {guest.name}
                                   </h3>
                                   <p className="text-sm text-gray-600">
-                                    {guest.pax} pax • {guest.phone || 'No phone'}
+                                    {guest.companion_count || 0} companion(s) • Table: {guest.table_number || '-'}
                                   </p>
                                 </div>
-                                <Badge.Status status={guest.status} />
+                                <Badge.Status status={guest.check_in_status} />
                               </div>
 
                               {/* Check-in Time */}
@@ -314,8 +318,8 @@ const AdminQueue = () => {
                                 <Clock className="w-4 h-4" />
                                 <span>
                                   Checked in:{' '}
-                                  {guest.checkInTime
-                                    ? formatDateTime(guest.checkInTime)
+                                  {guest.check_in_time
+                                    ? formatTimeAgo(guest.check_in_time)
                                     : 'Just now'}
                                 </span>
                               </div>
@@ -380,14 +384,14 @@ const AdminQueue = () => {
           if (!takeLoading) {
             setShowTakeModal(false);
             setSelectedGuest(null);
-            setTableNumber('');
+            setRunnerNotes('');
           }
         }}
         size="md"
       >
         <Modal.Header
           title="Take Guest to Table"
-          subtitle={`Assign ${selectedGuest?.name} to a table`}
+          subtitle={`Taking ${selectedGuest?.name} to table ${selectedGuest?.table_number}`}
           icon={UserCheck}
         />
 
@@ -405,32 +409,31 @@ const AdminQueue = () => {
                       {selectedGuest.name}
                     </p>
                     <p className="text-sm text-gray-600">
-                      {selectedGuest.pax} pax
+                      {selectedGuest.companion_count || 0} companion(s) • Table: {selectedGuest.table_number}
                     </p>
                   </div>
                 </div>
 
-                {selectedGuest.checkInTime && (
+                {selectedGuest.check_in_time && (
                   <p className="text-xs text-gray-500">
-                    Waiting since: {formatDateTime(selectedGuest.checkInTime)}
+                    Waiting since: {formatDateTime(selectedGuest.check_in_time)}
                   </p>
                 )}
               </div>
 
-              {/* Table Number Input */}
+              {/* Runner Notes Input (OPTIONAL) */}
               <div>
                 <Input
-                  label="Table Number"
-                  type="text"
-                  placeholder="Enter table number (e.g., 5, A1, VIP-3)"
-                  value={tableNumber}
-                  onChange={(e) => setTableNumber(e.target.value)}
-                  required
-                  autoFocus
+                  label="Runner Notes (Optional)"
+                  type="textarea"
+                  placeholder="Add any notes about seating this guest... (e.g., 'Seated at table, needs high chair', 'Requested window seat', etc.)"
+                  value={runnerNotes}
+                  onChange={(e) => setRunnerNotes(e.target.value)}
+                  rows={3}
                   disabled={takeLoading}
                 />
                 <p className="text-xs text-gray-500 mt-2">
-                  Enter the table number where this guest will be seated
+                  💡 Optional: Add any relevant notes about seating this guest
                 </p>
               </div>
             </>
@@ -443,7 +446,7 @@ const AdminQueue = () => {
             onClick={() => {
               setShowTakeModal(false);
               setSelectedGuest(null);
-              setTableNumber('');
+              setRunnerNotes('');
             }}
             disabled={takeLoading}
           >
@@ -453,7 +456,7 @@ const AdminQueue = () => {
             variant="primary"
             onClick={submitTakeGuest}
             loading={takeLoading}
-            disabled={takeLoading || !tableNumber.trim()}
+            disabled={takeLoading}
             leftIcon={!takeLoading && <ArrowRight className="w-5 h-5" />}
           >
             {takeLoading ? 'Taking Guest...' : 'Take to Table'}

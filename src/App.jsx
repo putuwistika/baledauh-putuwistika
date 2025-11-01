@@ -25,6 +25,7 @@ const LoadingScreen = () => (
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
+import ProfileCard from './components/ProfileCard'; // ✅ TAMBAHKAN INI!
 
 // Admin Pages - Lazy load (hanya load saat dibutuhkan)
 const AdminDashboard = lazy(() => import('./pages/Admin/Dashboard'));
@@ -61,14 +62,8 @@ const RunnerMyGuests = () => (
   </div>
 );
 
-const GuestCard = () => (
-  <div className="flex items-center justify-center min-h-screen bg-amber-50">
-    <div className="text-center p-8 bg-white rounded-xl shadow-lg">
-      <h1 className="text-3xl font-bold mb-2">💳 Guest Card</h1>
-      <p className="text-gray-600">Coming soon...</p>
-    </div>
-  </div>
-);
+// ❌ HAPUS GuestCard placeholder - sudah diganti dengan ProfileCard
+// const GuestCard = () => ( ... )
 
 // Error Boundary
 class ErrorBoundary extends React.Component {
@@ -147,7 +142,9 @@ const AppRoutes = () => (
       {/* Public */}
       <Route path={ROUTES.HOME} element={<Landing />} />
       <Route path={ROUTES.LOGIN} element={<PublicRoute><Login /></PublicRoute>} />
-      <Route path={ROUTES.GUEST_CARD} element={<GuestCard />} />
+      
+      {/* 🎊 ProfileCard - Guest Public Profile (✅ ROUTE BARU!) */}
+      <Route path={ROUTES.GUEST_CARD} element={<ProfileCard />} />
 
       {/* Admin - 5 Pages */}
       <Route path={ROUTES.ADMIN_DASHBOARD} element={
