@@ -1,0 +1,426 @@
+/**
+ * 🎊 RuangTamu - Wedding Check-in System
+ * Search Guest Page - Find guests with fuzzy search
+ * by PutuWistika
+ */
+
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import {
+  Search,
+  UserCheck,
+  Phone,
+  Gift,
+  Clock,
+  X,
+} from 'lucide-react';
+import Sidebar from '@components/Layout/Sidebar';
+import Navbar from '@components/Layout/Navbar';
+import Card from '@components/ui/Card';
+import Badge from '@components/ui/Badge';
+import Button from '@components/ui/Button';
+import Input from '@components/ui/Input';
+import Loading from '@components/ui/Loading';
+import { searchGuests, checkInGuest } from '@services/api';
+import { GUEST_STATUS } from '@utils/constants';
+import { formatCurrency, formatDateTime } from '@utils/helpers';
+import { toast } from 'sonner';
+
+/**
+ * Search Guest Component
+ * Search guests by name or phone with fuzzy matching
+ */
+const SearchGuest = () => {
+  // State
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [selectedGuest, setSelectedGuest] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [searching, setSearching] = useState(false);
+
+  // Handle search
+  const handleSearch = async (e) => {
+    e.preventDefault();
+
+    if (!searchQuery.trim()) {
+      toast.error('Please enter a search query');
+      return;
+    }
+
+    try {
+      setSearching(true);
+      const response = await searchGuests(searchQuery);
+      const results = response.data || [];
+
+      setSearchResults(results);
+
+      if (results.length === 0) {
+        toast.info('No guests found');
+      } else {
+        toast.success(`Found ${results.length} guest(s)`);
+      }
+    } catch (error) {
+      console.error('Search error:', error);
+      toast.error('Failed to search guests');
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  // Handle check-in
+  const handleCheckIn = async (guest) => {
+    if (guest.status !== GUEST_STATUS.WAITING) {
+      toast.error('Guest is already checked in');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await checkInGuest(guest.uid);
+      
+      toast.success(`${guest.name} checked in successfully!`);
+      
+      // Refresh search results
+      const response = await searchGuests(searchQuery);
+      setSearchResults(response.data || []);
+      
+      // Close detail view
+      setSelectedGuest(null);
+    } catch (error) {
+      console.error('Check-in error:', error);
+      toast.error('Failed to check in guest');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle clear search
+  const handleClearSearch = () => {
+    setSearchQuery('');
+    setSearchResults([]);
+    setSelectedGuest(null);
+  };
+
+  return (
+    <div className="flex h-screen bg-gray-50">
+      <Sidebar />
+      
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <Navbar title="Search Guest" />
+        
+        <main className="flex-1 overflow-y-auto pt-16">
+          <div className="p-6 max-w-7xl mx-auto">
+            {/* Header */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-8"
+            >
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                Search Guest
+              </h1>
+              <p className="text-gray-600">
+                Find guests by name or phone number using fuzzy search.
+              </p>
+            </motion.div>
+
+            {/* Search Form */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="mb-8"
+            >
+              <Card>
+                <form onSubmit={handleSearch}>
+                  <div className="flex gap-3">
+                    <div className="flex-1">
+                      <Input
+                        type="text"
+                        placeholder="Enter guest name or phone number..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        leftIcon={<Search className="w-5 h-5" />}
+                        rightIcon={
+                          searchQuery && (
+                            <button
+                              type="button"
+                              onClick={handleClearSearch}
+                              className="text-gray-400 hover:text-gray-600"
+                            >
+                              <X className="w-5 h-5" />
+                            </button>
+                          )
+                        }
+                        disabled={searching}
+                        autoFocus
+                      />
+                    </div>
+                    <Button
+                      type="submit"
+                      variant="primary"
+                      size="lg"
+                      loading={searching}
+                      disabled={searching || !searchQuery.trim()}
+                      leftIcon={!searching && <Search className="w-5 h-5" />}
+                    >
+                      Search
+                    </Button>
+                  </div>
+                </form>
+
+                {/* Search Tips */}
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <p className="text-sm text-gray-600 mb-2">
+                    💡 <strong>Search Tips:</strong>
+                  </p>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Partial names work (e.g., "john" finds "John Doe")</li>
+                    <li>• Phone numbers can be partial or full</li>
+                    <li>• Search is case-insensitive</li>
+                    <li>• Fuzzy matching helps with typos</li>
+                  </ul>
+                </div>
+              </Card>
+            </motion.div>
+
+            {/* Search Results */}
+            {searchResults.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="text-xl font-bold text-gray-900">
+                    Search Results
+                  </h2>
+                  <Badge variant="primary">
+                    {searchResults.length} found
+                  </Badge>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {searchResults.map((guest, index) => (
+                    <motion.div
+                      key={guest.uid}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.05 }}
+                    >
+                      <Card
+                        hover
+                        className="cursor-pointer"
+                        onClick={() => setSelectedGuest(guest)}
+                      >
+                        {/* Guest Header */}
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center font-bold text-lg">
+                              {guest.name?.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-gray-900">
+                                {guest.name}
+                              </h3>
+                              <p className="text-sm text-gray-500">
+                                {guest.pax} pax
+                              </p>
+                            </div>
+                          </div>
+                          <Badge.Status status={guest.status} />
+                        </div>
+
+                        {/* Guest Info */}
+                        <div className="space-y-2">
+                          {guest.phone && (
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                              <Phone className="w-4 h-4 flex-shrink-0" />
+                              <span>{guest.phone}</span>
+                            </div>
+                          )}
+
+                          {guest.angpao && (
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                              <Gift className="w-4 h-4 flex-shrink-0" />
+                              <span>{formatCurrency(guest.angpao)}</span>
+                            </div>
+                          )}
+
+                          {guest.checkInTime && (
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                              <Clock className="w-4 h-4 flex-shrink-0" />
+                              <span>{formatDateTime(guest.checkInTime)}</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Quick Action */}
+                        {guest.status === GUEST_STATUS.WAITING && (
+                          <div className="mt-4 pt-4 border-t border-gray-200">
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              fullWidth
+                              leftIcon={<UserCheck className="w-4 h-4" />}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleCheckIn(guest);
+                              }}
+                              loading={loading}
+                              disabled={loading}
+                            >
+                              Check In
+                            </Button>
+                          </div>
+                        )}
+                      </Card>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {/* No Results */}
+            {searchQuery && !searching && searchResults.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                <Card className="text-center py-12">
+                  <Search className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    No guests found
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    We couldn't find any guests matching "{searchQuery}"
+                  </p>
+                  <Button
+                    variant="outline"
+                    onClick={handleClearSearch}
+                  >
+                    Clear Search
+                  </Button>
+                </Card>
+              </motion.div>
+            )}
+
+            {/* Empty State */}
+            {!searchQuery && searchResults.length === 0 && !searching && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                <Card className="text-center py-12">
+                  <Search className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    Start Searching
+                  </h3>
+                  <p className="text-gray-600">
+                    Enter a guest name or phone number to begin searching.
+                  </p>
+                </Card>
+              </motion.div>
+            )}
+          </div>
+        </main>
+      </div>
+
+      {/* Guest Detail Modal (Optional - can be enhanced later) */}
+      {selectedGuest && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setSelectedGuest(null)}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setSelectedGuest(null)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Guest Detail */}
+            <div className="text-center mb-6">
+              <div className="w-20 h-20 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center font-bold text-2xl mx-auto mb-4">
+                {selectedGuest.name?.charAt(0).toUpperCase()}
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                {selectedGuest.name}
+              </h2>
+              <Badge.Status status={selectedGuest.status} />
+            </div>
+
+            {/* Details */}
+            <div className="space-y-3 mb-6">
+              {selectedGuest.phone && (
+                <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                  <span className="text-sm text-gray-600">Phone</span>
+                  <span className="font-medium text-gray-900">
+                    {selectedGuest.phone}
+                  </span>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                <span className="text-sm text-gray-600">Pax</span>
+                <span className="font-medium text-gray-900">
+                  {selectedGuest.pax}
+                </span>
+              </div>
+
+              {selectedGuest.angpao && (
+                <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                  <span className="text-sm text-gray-600">Angpao</span>
+                  <span className="font-medium text-gray-900">
+                    {formatCurrency(selectedGuest.angpao)}
+                  </span>
+                </div>
+              )}
+
+              {selectedGuest.checkInTime && (
+                <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                  <span className="text-sm text-gray-600">Check-in Time</span>
+                  <span className="font-medium text-gray-900">
+                    {formatDateTime(selectedGuest.checkInTime)}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                fullWidth
+                onClick={() => setSelectedGuest(null)}
+              >
+                Close
+              </Button>
+              {selectedGuest.status === GUEST_STATUS.WAITING && (
+                <Button
+                  variant="primary"
+                  fullWidth
+                  leftIcon={<UserCheck className="w-5 h-5" />}
+                  onClick={() => handleCheckIn(selectedGuest)}
+                  loading={loading}
+                  disabled={loading}
+                >
+                  Check In
+                </Button>
+              )}
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default SearchGuest;
