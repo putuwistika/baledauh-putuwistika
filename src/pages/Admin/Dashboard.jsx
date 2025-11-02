@@ -12,7 +12,6 @@ import {
   UserCheck,
   Clock,
   CheckCircle,
-  TrendingUp,
   ArrowRight,
   Search,
 } from 'lucide-react';
@@ -98,28 +97,24 @@ const AdminDashboard = () => {
       value: stats.total,
       icon: Users,
       color: 'blue',
-      trend: '+12%',
     },
     {
       title: 'Checked In',
       value: stats.checkedIn,
       icon: UserCheck,
       color: 'green',
-      trend: '+8%',
     },
     {
       title: 'In Queue',
       value: stats.inQueue,
       icon: Clock,
       color: 'yellow',
-      trend: '-5%',
     },
     {
       title: 'Completed',
       value: stats.completed,
       icon: CheckCircle,
       color: 'purple',
-      trend: '+15%',
     },
   ];
 
@@ -185,17 +180,11 @@ const AdminDashboard = () => {
                   transition={{ delay: index * 0.1 }}
                 >
                   <Card hover>
-                    <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center mb-4">
                       <div
                         className={`w-12 h-12 bg-${stat.color}-100 text-${stat.color}-600 rounded-xl flex items-center justify-center`}
                       >
                         <stat.icon className="w-6 h-6" />
-                      </div>
-                      <div className="flex items-center gap-1 text-sm">
-                        <TrendingUp className="w-4 h-4 text-green-500" />
-                        <span className="text-green-600 font-medium">
-                          {stat.trend}
-                        </span>
                       </div>
                     </div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-1">
