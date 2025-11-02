@@ -151,11 +151,15 @@ const Login = () => {
         >
           {/* Header */}
           <motion.div variants={itemVariants} className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 gradient-gemini text-white rounded-2xl mb-4 shadow-lg shadow-gemini">
-              <LogIn className="w-8 h-8" />
+            <div className="inline-flex items-center justify-center mb-4">
+              <img
+                src="/images/logo.png"
+                alt={APP_NAME}
+                className="h-20 w-20 object-contain drop-shadow-lg"
+              />
             </div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              Welcome to {APP_NAME}
+              Welcome to <span className="gradient-text">{APP_NAME}</span>
             </h1>
             <p className="text-gray-600">Sign in to manage your wedding guests</p>
             <p className="text-xs text-gray-500 mt-1">{APP_TAGLINE}</p>
