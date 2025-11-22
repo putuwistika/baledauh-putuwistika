@@ -18,6 +18,8 @@ import {
   Check,
   AlertCircle,
   Sparkles,
+  UserPlus,
+  MapPin,
 } from 'lucide-react';
 import Modal from '@components/ui/Modal';
 import Button from '@components/ui/Button';
@@ -104,18 +106,22 @@ const CheckInModal = ({ isOpen, onClose, guest, onSuccess }) => {
       // Handle response based on status
       if (response.success && response.statusCode === 200) {
         // Success - new check-in
-        setCheckedInGuest(response.guest);
+        // Merge original guest data with response to preserve all fields
+        const mergedGuest = { ...guest, ...response.guest };
+        setCheckedInGuest(mergedGuest);
         setIsAlreadyCheckedIn(false);
         setCurrentStep(3);
         toast.success('Guest checked in successfully! 🎉');
-        
+
         // Notify parent
         if (onSuccess) {
           onSuccess(response.guest);
         }
       } else if (response.statusCode === 400 && response.message === 'Guest already checked in') {
         // Already checked in
-        setCheckedInGuest(response.guest);
+        // Merge original guest data with response to preserve all fields
+        const mergedGuest = { ...guest, ...response.guest };
+        setCheckedInGuest(mergedGuest);
         setIsAlreadyCheckedIn(true);
         setCurrentStep(3);
         toast.info('Guest was already checked in');
@@ -136,6 +142,17 @@ const CheckInModal = ({ isOpen, onClose, guest, onSuccess }) => {
     if (!loading) {
       onClose();
     }
+  };
+
+  // Handle cancel check-in success
+  const handleCancelSuccess = (updatedGuest) => {
+    console.log('🚫 Check-in canceled:', updatedGuest);
+
+    // Close modal and notify parent
+    if (onSuccess) {
+      onSuccess(updatedGuest);
+    }
+    onClose();
   };
 
   // Handle next step
@@ -294,16 +311,21 @@ const CheckInModal = ({ isOpen, onClose, guest, onSuccess }) => {
 
                 {/* Details Grid */}
                 <div className="space-y-3">
-                  {/* Table Number */}
+                  {/* Table Number - HIGHLIGHTED! */}
                   {guest.table_number && (
-                    <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-2 px-3 py-2 bg-purple-50 text-purple-700 rounded-lg border border-purple-200 w-full">
-                        <Hash className="w-4 h-4 flex-shrink-0" />
-                        <div>
-                          <p className="text-xs text-purple-600">Nomor Meja</p>
-                          <p className="text-sm font-semibold text-purple-900">
-                            {guest.table_number}
-                          </p>
+                    <div className="relative">
+                      <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl blur opacity-30 animate-pulse"></div>
+                      <div className="relative flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-br from-purple-500 to-pink-500 text-white rounded-xl border-2 border-white shadow-xl">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/50">
+                            <MapPin className="w-6 h-6" />
+                          </div>
+                          <div>
+                            <p className="text-xs font-medium text-white/90 uppercase tracking-wide">Nomor Meja</p>
+                            <p className="text-3xl font-bold text-white drop-shadow-lg">
+                              {guest.table_number}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -325,25 +347,55 @@ const CheckInModal = ({ isOpen, onClose, guest, onSuccess }) => {
                   )}
 
                   {/* Invitation Details - Group Names or Value */}
-                  {(guest.invitation_group_names?.length > 0 || guest.invitation_value) && (
+                  {guest.invitation_group_names?.length > 0 ? (
+                    <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-lg border border-emerald-200 p-3">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Users className="w-4 h-4 text-emerald-600" />
+                        <p className="text-xs font-semibold text-emerald-700">Group Members</p>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {guest.invitation_group_names.map((name, idx) => (
+                          <div
+                            key={idx}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white text-emerald-700 rounded-full border border-emerald-300 text-xs font-medium shadow-sm"
+                          >
+                            <UserPlus className="w-3 h-3" />
+                            <span>{name}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : guest.invitation_value === 'alone' ? (
                     <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 text-amber-700 rounded-lg border border-amber-200 w-full">
-                        <Users className="w-4 h-4 flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs text-amber-600">Invitation Details</p>
-                          <p className="text-sm font-semibold text-amber-900 break-words">
-                            {guest.invitation_group_names?.length > 0
-                              ? `With: ${guest.invitation_group_names.join(', ')}`
-                              : guest.invitation_value === 'alone'
-                              ? 'Solo Invitation'
-                              : guest.invitation_value === 'group'
-                              ? 'Group Invitation'
-                              : guest.invitation_value}
-                          </p>
+                      <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-br from-amber-50 to-orange-50 text-amber-700 rounded-lg border border-amber-200 w-full">
+                        <User className="w-4 h-4 flex-shrink-0" />
+                        <div>
+                          <p className="text-xs text-amber-600">Invitation Type</p>
+                          <p className="text-sm font-semibold text-amber-900">Solo Invitation</p>
                         </div>
                       </div>
                     </div>
-                  )}
+                  ) : guest.invitation_value === 'group' ? (
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-br from-emerald-50 to-green-50 text-emerald-700 rounded-lg border border-emerald-200 w-full">
+                        <Users className="w-4 h-4 flex-shrink-0" />
+                        <div>
+                          <p className="text-xs text-emerald-600">Invitation Type</p>
+                          <p className="text-sm font-semibold text-emerald-900">Group Invitation</p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : guest.invitation_value ? (
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 text-slate-700 rounded-lg border border-slate-200 w-full">
+                        <Users className="w-4 h-4 flex-shrink-0" />
+                        <div>
+                          <p className="text-xs text-slate-600">Invitation Details</p>
+                          <p className="text-sm font-semibold text-slate-900">{guest.invitation_value}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
 
                   {/* Companions */}
                   <div className="flex items-center gap-2">
@@ -592,6 +644,7 @@ const CheckInModal = ({ isOpen, onClose, guest, onSuccess }) => {
                   guest={checkedInGuest}
                   showQR={true}
                   showActions={false}
+                  onCancelSuccess={handleCancelSuccess}
                 />
               </div>
             </Modal.Body>

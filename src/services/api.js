@@ -273,6 +273,47 @@ export const checkInGuest = async (uid, checkInData = {}) => {
 };
 
 /**
+ * Cancel check-in (Reset check-in data)
+ * Uses the same endpoint as checkInGuest but with empty/reset values
+ */
+export const cancelCheckIn = async (uid) => {
+  try {
+    console.log('🚫 Canceling check-in for guest:', uid);
+
+    // Send payload with empty strings to reset ALL check-in data
+    // is_cancel flag indicates this is a cancellation request
+    const payload = {
+      uid,
+      is_cancel: true,              // ← FLAG for backend
+      is_checked_in: '',
+      check_in_status: '',
+      check_in_time: '',
+      checked_in_by: '',
+      companion_count: '',
+      gift_type: '',
+      gift_notes: '',
+    };
+
+    console.log('📤 Cancel check-in payload:', payload);
+
+    const response = await api.post('/webhook/check-in-guest', payload);
+
+    console.log('✅ Cancel check-in response:', response);
+
+    return {
+      success: response.success || !response._error,
+      message: response.message || 'Check-in canceled',
+      statusCode: response.statusCode || 200,
+      guest: response.guest,
+      _error: response._error,
+    };
+  } catch (error) {
+    console.error('❌ Cancel check-in error:', error);
+    throw error;
+  }
+};
+
+/**
  * Take guest from queue (Runner)
  * Endpoint: POST /webhook/take-guest
  */

@@ -15,6 +15,8 @@ import {
   Eye,
   Clock,
   Users,
+  User,
+  UserPlus,
 } from 'lucide-react';
 import Sidebar from '@components/Layout/Sidebar';
 import Navbar from '@components/Layout/Navbar';
@@ -257,22 +259,46 @@ const SearchGuest = () => {
                           )}
 
                           {/* Invitation Details - Group Names or Value */}
-                          {(guest.invitation_group_names?.length > 0 || guest.invitation_value) && (
-                            <div className="flex items-center gap-2 text-sm">
-                              <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg border border-green-200">
-                                <Users className="w-4 h-4 flex-shrink-0" />
-                                <span className="font-medium">
-                                  {guest.invitation_group_names?.length > 0
-                                    ? `With: ${guest.invitation_group_names.join(', ')}`
-                                    : guest.invitation_value === 'alone'
-                                    ? 'Solo Invitation'
-                                    : guest.invitation_value === 'group'
-                                    ? 'Group Invitation'
-                                    : guest.invitation_value}
-                                </span>
+                          {guest.invitation_group_names?.length > 0 ? (
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2 text-xs text-gray-600">
+                                <Users className="w-3.5 h-3.5" />
+                                <span className="font-medium">Group Members:</span>
+                              </div>
+                              <div className="flex flex-wrap gap-1.5">
+                                {guest.invitation_group_names.map((name, idx) => (
+                                  <div
+                                    key={idx}
+                                    className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-emerald-50 to-green-50 text-emerald-700 rounded-full border border-emerald-200 text-xs font-medium"
+                                  >
+                                    <UserPlus className="w-3 h-3" />
+                                    <span>{name}</span>
+                                  </div>
+                                ))}
                               </div>
                             </div>
-                          )}
+                          ) : guest.invitation_value === 'alone' ? (
+                            <div className="flex items-center gap-2 text-sm">
+                              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-amber-50 to-orange-50 text-amber-700 rounded-lg border border-amber-200">
+                                <User className="w-4 h-4 flex-shrink-0" />
+                                <span className="font-medium">Solo Invitation</span>
+                              </div>
+                            </div>
+                          ) : guest.invitation_value === 'group' ? (
+                            <div className="flex items-center gap-2 text-sm">
+                              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-emerald-50 to-green-50 text-emerald-700 rounded-lg border border-emerald-200">
+                                <Users className="w-4 h-4 flex-shrink-0" />
+                                <span className="font-medium">Group Invitation</span>
+                              </div>
+                            </div>
+                          ) : guest.invitation_value ? (
+                            <div className="flex items-center gap-2 text-sm">
+                              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-slate-50 to-gray-50 text-slate-700 rounded-lg border border-slate-200">
+                                <Users className="w-4 h-4 flex-shrink-0" />
+                                <span className="font-medium">{guest.invitation_value}</span>
+                              </div>
+                            </div>
+                          ) : null}
 
                           {/* If no table and no invitation type, show placeholder */}
                           {!guest.table_number && !guest.invitation_type && !guest.invitation_value && !guest.invitation_group_names?.length && (
@@ -444,23 +470,51 @@ const SearchGuest = () => {
               )}
 
               {/* Invitation Details */}
-              {(selectedGuest.invitation_group_names?.length > 0 || selectedGuest.invitation_value) && (
+              {selectedGuest.invitation_group_names?.length > 0 ? (
+                <div className="py-3 border-b border-gray-100">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Users className="w-4 h-4 text-emerald-600" />
+                    <span className="text-sm font-medium text-gray-700">Group Members</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {selectedGuest.invitation_group_names.map((name, idx) => (
+                      <div
+                        key={idx}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-emerald-50 to-green-50 text-emerald-700 rounded-full border border-emerald-200 text-xs font-medium"
+                      >
+                        <UserPlus className="w-3 h-3" />
+                        <span>{name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : selectedGuest.invitation_value ? (
                 <div className="flex items-center justify-between py-2 border-b border-gray-100">
                   <span className="text-sm text-gray-600 flex items-center gap-2">
-                    <Users className="w-4 h-4" />
-                    Invitation Details
+                    {selectedGuest.invitation_value === 'alone' ? (
+                      <User className="w-4 h-4 text-amber-600" />
+                    ) : (
+                      <Users className="w-4 h-4 text-emerald-600" />
+                    )}
+                    Invitation Type
                   </span>
-                  <span className="font-medium text-gray-900 text-right text-xs max-w-[200px]">
-                    {selectedGuest.invitation_group_names?.length > 0
-                      ? `With: ${selectedGuest.invitation_group_names.join(', ')}`
-                      : selectedGuest.invitation_value === 'alone'
-                      ? 'Solo Invitation'
-                      : selectedGuest.invitation_value === 'group'
-                      ? 'Group Invitation'
-                      : selectedGuest.invitation_value}
+                  <span className="font-medium text-gray-900">
+                    {selectedGuest.invitation_value === 'alone' ? (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-amber-50 to-orange-50 text-amber-700 rounded-full border border-amber-200 text-xs">
+                        <User className="w-3 h-3" />
+                        Solo
+                      </span>
+                    ) : selectedGuest.invitation_value === 'group' ? (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-emerald-50 to-green-50 text-emerald-700 rounded-full border border-emerald-200 text-xs">
+                        <Users className="w-3 h-3" />
+                        Group
+                      </span>
+                    ) : (
+                      selectedGuest.invitation_value
+                    )}
                   </span>
                 </div>
-              )}
+              ) : null}
 
               {/* Check-in Time */}
               {selectedGuest.check_in_time && (
