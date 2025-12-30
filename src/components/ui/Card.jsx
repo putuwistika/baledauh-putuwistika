@@ -41,10 +41,10 @@ const Card = ({
 
   // Base classes
   const baseClasses = cn(
-    'rounded-xl shadow-sm transition-all duration-200',
+    'rounded-xl shadow-baleda transition-all duration-200',
     variants[variant],
     paddings[padding],
-    hover && 'hover:shadow-md hover:-translate-y-1 cursor-pointer',
+    hover && 'hover:shadow-gold hover:-translate-y-1 cursor-pointer',
     onClick && 'cursor-pointer',
     className
   );
