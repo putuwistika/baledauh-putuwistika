@@ -108,8 +108,8 @@ const Sidebar = ({ collapsed = false, onToggle }) => {
         to={item.path}
         className={cn(
           'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
-          'hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50',
-          active && 'bg-gradient-to-r from-cyan-50 via-blue-50 to-purple-50 text-blue-700 font-medium shadow-sm',
+          'hover:bg-gold-50',
+          active && 'bg-gold-100 text-green-700 font-medium shadow-sm border border-gold-200',
           !active && 'text-gray-700'
         )}
         onClick={() => setMobileOpen(false)}
@@ -170,7 +170,7 @@ const Sidebar = ({ collapsed = false, onToggle }) => {
         {(isMobile || isExpanded) && (
           <div className="mb-4">
             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-              <div className="w-10 h-10 gradient-gemini text-white rounded-full flex items-center justify-center font-semibold shadow-md">
+              <div className="w-10 h-10 bg-gradient-to-br from-gold-400 to-gold-500 text-white rounded-full flex items-center justify-center font-semibold shadow-md">
                 {user?.name?.charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">

@@ -96,7 +96,7 @@ const Landing = () => {
                 size="md"
                 rightIcon={<ArrowRight className="w-4 h-4" />}
                 onClick={() => navigate(ROUTES.LOGIN)}
-                className="bg-gradient-to-r from-gold-400 to-gold-500 hover:from-gold-500 hover:to-gold-600 text-white transition-all duration-300 shadow-md"
+                className="transition-all duration-300 font-semibold"
               >
                 Login
               </Button>
@@ -118,7 +118,7 @@ const Landing = () => {
       {/* ============================================ */}
       {/* 1️⃣ HERO SECTION */}
       {/* ============================================ */}
-      <section className="relative overflow-hidden pt-28 pb-20 bg-gradient-to-b from-white to-pampas-50">
+      <section className="relative overflow-hidden pt-28 pb-20 gradient-hero">
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
@@ -154,7 +154,7 @@ const Landing = () => {
                   variant="primary"
                   size="lg"
                   onClick={() => navigate(ROUTES.LOGIN)}
-                  className="bg-gradient-to-r from-gold-400 to-gold-500 hover:from-gold-500 hover:to-gold-600 text-white shadow-xl"
+                  className="shadow-baleda font-bold"
                 >
                   Get a Demo
                 </Button>
@@ -188,7 +188,7 @@ const Landing = () => {
                   repeat: Infinity,
                   ease: "easeInOut"
                 }}
-                className="absolute top-0 left-0 bg-white rounded-2xl shadow-xl p-6 border-2 border-gold-200 w-64"
+                className="absolute top-0 left-0 bg-white rounded-2xl shadow-baleda p-6 border-2 border-gold-200 w-64"
               >
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-12 h-12 bg-gradient-to-br from-gold-400 to-gold-500 rounded-xl flex items-center justify-center">
@@ -229,7 +229,7 @@ const Landing = () => {
                   ease: "easeInOut",
                   delay: 0.5
                 }}
-                className="absolute top-40 right-0 bg-white rounded-2xl shadow-xl p-6 border-2 border-green-200 w-64"
+                className="absolute top-40 right-0 bg-white rounded-2xl shadow-baleda p-6 border-2 border-green-200 w-64"
               >
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-green-700 rounded-xl flex items-center justify-center">
@@ -270,7 +270,7 @@ const Landing = () => {
                   ease: "easeInOut",
                   delay: 1
                 }}
-                className="absolute bottom-0 left-12 bg-white rounded-2xl shadow-xl p-6 border-2 border-gold-200 w-64"
+                className="absolute bottom-0 left-12 bg-white rounded-2xl shadow-baleda p-6 border-2 border-gold-200 w-64"
               >
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-12 h-12 bg-gradient-to-br from-gold-400 to-gold-500 rounded-xl flex items-center justify-center">
@@ -391,7 +391,7 @@ const Landing = () => {
       {/* ============================================ */}
       {/* 4️⃣ SERVICES / FEATURES */}
       {/* ============================================ */}
-      <section className="py-20 bg-gradient-to-b from-pampas-50 to-white">
+      <section className="py-20 gradient-section">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -413,7 +413,7 @@ const Landing = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
               whileHover={{ y: -10 }}
-              className="bg-white rounded-3xl shadow-xl border-2 border-gold-200 p-8 relative overflow-hidden group"
+              className="bg-white rounded-3xl shadow-baleda border-2 border-gold-200 p-8 relative overflow-hidden group"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-gold-200 to-transparent rounded-bl-full opacity-50" />
 
@@ -453,7 +453,7 @@ const Landing = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.1 }}
               whileHover={{ y: -10 }}
-              className="bg-white rounded-3xl shadow-xl border-2 border-green-200 p-8 relative overflow-hidden group"
+              className="bg-white rounded-3xl shadow-baleda border-2 border-green-200 p-8 relative overflow-hidden group"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-200 to-transparent rounded-bl-full opacity-50" />
 
@@ -493,7 +493,7 @@ const Landing = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
               whileHover={{ y: -10 }}
-              className="bg-white rounded-3xl shadow-xl border-2 border-gold-200 p-8 relative overflow-hidden group"
+              className="bg-white rounded-3xl shadow-baleda border-2 border-gold-200 p-8 relative overflow-hidden group"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-red-200 to-transparent rounded-bl-full opacity-30" />
 
@@ -532,7 +532,7 @@ const Landing = () => {
       {/* ============================================ */}
       {/* 5️⃣ HOW IT WORKS - Animated Flow Line */}
       {/* ============================================ */}
-      <section id="how-it-works" ref={flowRef} className="py-24 bg-gradient-to-b from-white to-pampas-50 relative overflow-hidden">
+      <section id="how-it-works" ref={flowRef} className="py-24 gradient-hero relative overflow-hidden">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -573,7 +573,7 @@ const Landing = () => {
               >
                 <motion.div
                   whileHover={{ scale: 1.1, rotate: 5 }}
-                  className="w-20 h-20 bg-gradient-to-br from-gold-400 to-gold-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl"
+                  className="w-20 h-20 bg-gradient-to-br from-gold-400 to-gold-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-baleda"
                 >
                   <MessageSquare className="w-10 h-10 text-white" />
                 </motion.div>
@@ -592,7 +592,7 @@ const Landing = () => {
               >
                 <motion.div
                   whileHover={{ scale: 1.1, rotate: -5 }}
-                  className="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl"
+                  className="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-baleda"
                 >
                   <QrCode className="w-10 h-10 text-white" />
                 </motion.div>
@@ -611,7 +611,7 @@ const Landing = () => {
               >
                 <motion.div
                   whileHover={{ scale: 1.1, rotate: 5 }}
-                  className="w-20 h-20 bg-gradient-to-br from-green-600 to-green-700 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl"
+                  className="w-20 h-20 bg-gradient-to-br from-green-600 to-green-700 rounded-full flex items-center justify-center mx-auto mb-6 shadow-baleda"
                 >
                   <CheckCircle className="w-10 h-10 text-white" />
                 </motion.div>
@@ -630,7 +630,7 @@ const Landing = () => {
               >
                 <motion.div
                   whileHover={{ scale: 1.1, rotate: -5 }}
-                  className="w-20 h-20 bg-gradient-to-br from-red-600 to-red-700 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl"
+                  className="w-20 h-20 bg-gradient-to-br from-red-600 to-red-700 rounded-full flex items-center justify-center mx-auto mb-6 shadow-baleda"
                 >
                   <BarChart3 className="w-10 h-10 text-white" />
                 </motion.div>
@@ -712,7 +712,7 @@ const Landing = () => {
       {/* ============================================ */}
       {/* 8️⃣ FINAL CTA */}
       {/* ============================================ */}
-      <section className="py-24 bg-gradient-to-br from-green-700 via-green-600 to-gold-500 text-white relative overflow-hidden">
+      <section className="py-24 gradient-dark text-white relative overflow-hidden">
         {/* Subtle Wayang pattern overlay */}
         <div className="absolute inset-0 opacity-5">
           <svg width="100%" height="100%">
@@ -744,7 +744,7 @@ const Landing = () => {
                 size="lg"
                 rightIcon={<ArrowRight className="w-5 h-5" />}
                 onClick={() => navigate(ROUTES.LOGIN)}
-                className="shadow-2xl bg-white text-green-700 hover:bg-pampas-50 px-10 py-5 text-xl font-bold transition-all duration-300"
+                className="shadow-baleda bg-white text-green-700 hover:bg-pampas-50 px-10 py-5 text-xl font-bold transition-all duration-300"
               >
                 Request Demo
               </Button>
@@ -756,8 +756,8 @@ const Landing = () => {
       {/* ============================================ */}
       {/* FOOTER */}
       {/* ============================================ */}
-      <footer className="py-10 bg-green-900 text-green-100 relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-gold-400 via-green-500 to-gold-400" />
+      <footer className="py-10 gradient-dark text-white relative overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-1" style={{ background: 'linear-gradient(90deg, #E1A847 0%, #32491E 50%, #E1A847 100%)' }} />
 
         <div className="container mx-auto px-4 text-center relative z-10">
           <motion.div
