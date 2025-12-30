@@ -1,7 +1,7 @@
 /**
  * 🌺 Baleda - Digital Guest Reception Platform
- * Landing Page - Complete Redesign
- * Rooted in Balinese tradition, powered by modern technology
+ * Landing Page - Modern SaaS Design
+ * Digital guest reception, simplified
  */
 
 import React, { useRef, useEffect } from 'react';
@@ -134,7 +134,7 @@ const Landing = () => {
                 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-green-700 mb-6 leading-tight"
               >
                 Digital Guest Reception,{' '}
-                <span className="text-gold-400">Rooted in Tradition</span>
+                <span className="text-gold-400">Simplified</span>
               </motion.h1>
 
               {/* Subheadline */}
@@ -142,7 +142,7 @@ const Landing = () => {
                 variants={fadeInUp}
                 className="text-lg sm:text-xl text-gray-700 mb-8 leading-relaxed"
               >
-                Manage invitations, RSVP, and guest check-in seamlessly — so every arrival feels <span className="font-semibold text-green-700">welcomed, not rushed</span>.
+                Manage invitations, RSVP, and guest check-in in one seamless system — no queues, no confusion.
               </motion.p>
 
               {/* CTAs */}
@@ -301,7 +301,7 @@ const Landing = () => {
             className="text-center mb-12"
           >
             <h2 className="text-4xl sm:text-5xl font-bold text-red-700 mb-4">
-              Before Baleda
+              Guest Reception Shouldn't Be This Complicated
             </h2>
             <p className="text-lg text-gray-700 max-w-2xl mx-auto">
               Traditional guest management creates chaos at the gate
@@ -379,10 +379,10 @@ const Landing = () => {
             className="text-center mb-16"
           >
             <h2 className="text-4xl sm:text-5xl font-bold text-green-700 mb-4">
-              A Better Way to Welcome Your Guests
+              One System for Invitations, Arrival, and Attendance
             </h2>
             <p className="text-lg text-gray-700 max-w-3xl mx-auto">
-              Baleda transforms the way you receive guests — from the first invitation to the moment they arrive.
+              Baleda helps you manage the entire guest journey — from invitation to arrival — with clarity and control.
             </p>
           </motion.div>
         </div>
@@ -426,7 +426,7 @@ const Landing = () => {
                 <p className="text-sm text-gray-500 mb-4">Invitation & RSVP</p>
 
                 <p className="text-gray-700 mb-6 leading-relaxed">
-                  Dauhin manages your invitations and RSVP through WhatsApp and web — automatically informing, reminding, and recording responses.
+                  Send invitations and collect RSVP automatically via WhatsApp and web.
                 </p>
 
                 <div className="space-y-2 text-sm">
@@ -466,7 +466,7 @@ const Landing = () => {
                 <p className="text-sm text-gray-500 mb-4">Guest Check-in</p>
 
                 <p className="text-gray-700 mb-6 leading-relaxed">
-                  Panyanggra replaces your guest book with a smooth digital check-in experience using QR codes.
+                  Replace your guest book with fast, secure QR code check-in.
                 </p>
 
                 <div className="space-y-2 text-sm">
@@ -506,7 +506,7 @@ const Landing = () => {
                 <p className="text-sm text-gray-500 mb-4">Report & Insight</p>
 
                 <p className="text-gray-700 mb-6 leading-relaxed">
-                  Penampen gives you a clear summary of your event — who came, when they arrived, and how the flow performed.
+                  Monitor attendance and download clear, structured reports.
                 </p>
 
                 <div className="space-y-2 text-sm">
@@ -577,8 +577,8 @@ const Landing = () => {
                 >
                   <MessageSquare className="w-10 h-10 text-white" />
                 </motion.div>
-                <h3 className="text-xl font-bold text-green-700 mb-2">Dauhin</h3>
-                <p className="text-sm text-gray-600 mb-4">Upload your guest list</p>
+                <h3 className="text-xl font-bold text-green-700 mb-2">Upload Guest List</h3>
+                <p className="text-sm text-gray-600 mb-4">You provide names and phone numbers</p>
                 <p className="text-xs text-gray-500">We send invitations & collect RSVP automatically</p>
               </motion.div>
 
@@ -597,7 +597,7 @@ const Landing = () => {
                   <QrCode className="w-10 h-10 text-white" />
                 </motion.div>
                 <h3 className="text-xl font-bold text-green-700 mb-2">QR Code Issued</h3>
-                <p className="text-sm text-gray-600 mb-4">Each guest receives unique code</p>
+                <p className="text-sm text-gray-600 mb-4">Confirmed guests receive unique QR codes</p>
                 <p className="text-xs text-gray-500">Sent via WhatsApp with event details</p>
               </motion.div>
 
@@ -615,8 +615,8 @@ const Landing = () => {
                 >
                   <CheckCircle className="w-10 h-10 text-white" />
                 </motion.div>
-                <h3 className="text-xl font-bold text-green-700 mb-2">Panyanggra</h3>
-                <p className="text-sm text-gray-600 mb-4">Guests scan on arrival</p>
+                <h3 className="text-xl font-bold text-green-700 mb-2">Check-in on Event Day</h3>
+                <p className="text-sm text-gray-600 mb-4">Guests scan QR code on arrival</p>
                 <p className="text-xs text-gray-500">Instant check-in, no waiting</p>
               </motion.div>
 
@@ -634,8 +634,8 @@ const Landing = () => {
                 >
                   <BarChart3 className="w-10 h-10 text-white" />
                 </motion.div>
-                <h3 className="text-xl font-bold text-green-700 mb-2">Penampen</h3>
-                <p className="text-sm text-gray-600 mb-4">Monitor & download reports</p>
+                <h3 className="text-xl font-bold text-green-700 mb-2">Live Monitoring & Report</h3>
+                <p className="text-sm text-gray-600 mb-4">Track attendance and download reports</p>
                 <p className="text-xs text-gray-500">Real-time insights, Excel export</p>
               </motion.div>
             </div>
@@ -700,10 +700,10 @@ const Landing = () => {
           >
             <Shield className="w-20 h-20 text-green-700 mx-auto mb-6" />
             <h2 className="text-3xl sm:text-4xl font-bold text-green-700 mb-6">
-              Designed for Events That Value Order and Hospitality
+              Built for Events That Value Order and Hospitality
             </h2>
             <p className="text-lg text-gray-700 leading-relaxed">
-              Baleda brings the calm dignity of traditional Balinese hospitality into the digital age. Every guest feels seen, every arrival feels intentional.
+              Baleda delivers clarity and control for every stage of your event. Every guest feels welcomed, every arrival feels intentional.
             </p>
           </motion.div>
         </div>
@@ -731,7 +731,7 @@ const Landing = () => {
             transition={{ duration: 0.7 }}
           >
             <h2 className="text-4xl sm:text-6xl font-bold mb-6 leading-tight">
-              Welcome Your Guests,<br />Without the Chaos
+              Welcome Guests Smoothly,<br />From Start to Finish
             </h2>
 
             <motion.div
@@ -775,7 +775,7 @@ const Landing = () => {
               © 2025 {APP_NAME} • {APP_TAGLINE}
             </p>
             <p className="text-xs opacity-75">
-              Rooted in tradition, powered by technology
+              Digital guest reception, simplified
             </p>
           </motion.div>
         </div>
