@@ -1,7 +1,7 @@
 /**
- * 🎊 RuangTamu - Wedding Check-in System
+ * 🌺 Baleda - Digital Guest Reception Platform
  * Landing Page
- * by PutuWistika
+ * Inspired by Balinese Bale Dauh - traditional guest welcoming space
  */
 
 import React from 'react';
@@ -85,13 +85,13 @@ const Landing = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cyan-50 via-blue-50 to-purple-50">
+    <div className="min-h-screen bg-white">
       {/* Navbar with Logo */}
       <motion.nav
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-blue-100/50 shadow-sm"
+        className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-gold-100/50 shadow-sm"
       >
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
@@ -124,7 +124,7 @@ const Landing = () => {
                 size="md"
                 rightIcon={<ArrowRight className="w-4 h-4" />}
                 onClick={() => navigate(ROUTES.LOGIN)}
-                className="gradient-gemini hover:gradient-gemini-hover transition-all duration-300 shadow-md shadow-gemini"
+                className="gradient-baleda hover:gradient-baleda-hover text-white transition-all duration-300 shadow-md shadow-gold"
               >
                 Login
               </Button>
@@ -133,7 +133,7 @@ const Landing = () => {
         </div>
       </motion.nav>
 
-      {/* Animated Background Elements */}
+      {/* Animated Background Elements - Subtle Baleda colors */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <motion.div
           animate={{
@@ -145,7 +145,7 @@ const Landing = () => {
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-br from-cyan-300/20 to-blue-300/20 rounded-full blur-3xl"
+          className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-br from-gold-200/15 to-gold-100/10 rounded-full blur-3xl"
         />
         <motion.div
           animate={{
@@ -157,7 +157,7 @@ const Landing = () => {
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-br from-purple-300/20 to-cyan-300/20 rounded-full blur-3xl"
+          className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-br from-green-200/15 to-gold-100/10 rounded-full blur-3xl"
         />
       </div>
 
@@ -176,10 +176,10 @@ const Landing = () => {
               <motion.div
                 variants={itemVariants}
                 whileHover={{ scale: 1.05 }}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-cyan-100 to-purple-100 text-blue-700 rounded-full text-sm font-semibold mb-6 shadow-lg shadow-gemini backdrop-blur-sm border border-blue-200/50"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-gold-50 to-green-50 text-green-700 rounded-full text-sm font-semibold mb-6 shadow-lg shadow-gold/20 backdrop-blur-sm border border-gold-200/50"
               >
-                <Sparkles className="w-4 h-4 animate-pulse" />
-                <span>Modern Wedding Management</span>
+                <Sparkles className="w-4 h-4 animate-pulse text-gold-400" />
+                <span>Inspired by Balinese Bale Dauh</span>
               </motion.div>
 
               {/* Title */}
@@ -198,14 +198,14 @@ const Landing = () => {
                 variants={itemVariants}
                 className="text-lg sm:text-xl text-gray-700 mb-4 leading-relaxed"
               >
-                Professional wedding guest check-in system with real-time queue
-                management and seamless coordination.
+                A modern digital platform for welcoming guests with dignity, order, and efficiency.
+                Transform traditional hospitality into seamless guest management.
               </motion.p>
 
               {/* Tagline */}
               <motion.p
                 variants={itemVariants}
-                className="text-base text-blue-600 font-medium mb-10"
+                className="text-base text-green-700 font-medium mb-10"
               >
                 {APP_TAGLINE}
               </motion.p>
@@ -224,7 +224,7 @@ const Landing = () => {
                     size="lg"
                     rightIcon={<ArrowRight className="w-5 h-5" />}
                     onClick={() => navigate(ROUTES.LOGIN)}
-                    className="shadow-xl shadow-gemini gradient-gemini hover:gradient-gemini-hover transition-all duration-300"
+                    className="shadow-xl shadow-baleda gradient-baleda hover:gradient-baleda-hover text-white transition-all duration-300"
                   >
                     Get Started
                   </Button>
@@ -242,7 +242,7 @@ const Landing = () => {
                         behavior: 'smooth',
                       });
                     }}
-                    className="border-2 border-blue-300 text-blue-700 hover:bg-blue-50 hover:border-blue-400 transition-all duration-300"
+                    className="border-2 border-green-300 text-green-700 hover:bg-green-50 hover:border-green-400 transition-all duration-300"
                   >
                     Learn More
                   </Button>
@@ -252,7 +252,7 @@ const Landing = () => {
               {/* Stats */}
               <motion.div
                 variants={itemVariants}
-                className="grid grid-cols-3 gap-6 mt-16 pt-10 border-t-2 border-blue-200/50"
+                className="grid grid-cols-3 gap-6 mt-16 pt-10 border-t-2 border-gold-200/50"
               >
                 <motion.div
                   className="text-center lg:text-left"
@@ -315,7 +315,7 @@ const Landing = () => {
 
               {/* Background Decoration */}
               <motion.div
-                className="absolute inset-0 bg-gradient-to-br from-cyan-400/30 via-blue-400/30 to-purple-400/30 rounded-full blur-3xl -z-10"
+                className="absolute inset-0 bg-gradient-to-br from-gold-200/20 via-gold-100/15 to-green-200/20 rounded-full blur-3xl -z-10"
                 animate={{
                   scale: [1, 1.1, 1],
                   rotate: [0, 180, 360],
@@ -329,7 +329,7 @@ const Landing = () => {
 
               {/* Additional floating elements */}
               <motion.div
-                className="absolute -top-10 -right-10 w-20 h-20 bg-gradient-to-br from-purple-400 to-blue-400 rounded-full blur-xl opacity-60"
+                className="absolute -top-10 -right-10 w-20 h-20 bg-gradient-to-br from-gold-300 to-gold-200 rounded-full blur-xl opacity-40"
                 animate={{
                   y: [0, -20, 0],
                   x: [0, 10, 0],
@@ -341,7 +341,7 @@ const Landing = () => {
                 }}
               />
               <motion.div
-                className="absolute -bottom-10 -left-10 w-32 h-32 bg-gradient-to-br from-cyan-400 to-blue-400 rounded-full blur-xl opacity-60"
+                className="absolute -bottom-10 -left-10 w-32 h-32 bg-gradient-to-br from-green-200 to-gold-200 rounded-full blur-xl opacity-40"
                 animate={{
                   y: [0, 20, 0],
                   x: [0, -10, 0],

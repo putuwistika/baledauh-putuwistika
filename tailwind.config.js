@@ -7,19 +7,60 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Gemini Gradient Color Palette
+        // Baleda Brand Color Palette
+        // Inspired by Balinese Bale Dauh - traditional guest welcoming space
         primary: {
-          50: '#e0f2fe',
-          100: '#bae6fd',
-          200: '#7dd3fc',
-          300: '#38bdf8',
-          400: '#0ea5e9',
-          500: '#0284c7',
-          600: '#0369a1',
-          700: '#075985',
-          800: '#0c4a6e',
-          900: '#082f49',
+          50: '#f9fafb',
+          100: '#f3f4f6',
+          200: '#e5e7eb',
+          300: '#d1d5db',
+          400: '#9ca3af',
+          500: '#6b7280',
+          600: '#4b5563',
+          700: '#374151',
+          800: '#1f2937',
+          900: '#111827',
         },
+        // Ceremonial Gold - for highlights, gradients, and CTAs
+        gold: {
+          50: '#fdf8f0',
+          100: '#faf0dc',
+          200: '#f5deb3',
+          300: '#efc97f',
+          400: '#E1A847', // Main ceremonial gold
+          500: '#d49435',
+          600: '#b87a28',
+          700: '#946020',
+          800: '#784e1d',
+          900: '#5f3e19',
+        },
+        // Deep Green - for structure, navigation, and headings
+        green: {
+          50: '#f6f8f4',
+          100: '#e8ede4',
+          200: '#d1dbc9',
+          300: '#a9bea0',
+          400: '#7a9a6b',
+          500: '#587a4a',
+          600: '#435e38',
+          700: '#32491E', // Main deep green
+          800: '#2a3d1a',
+          900: '#223217',
+        },
+        // Deep Red - for status and presence indicators (use sparingly)
+        red: {
+          50: '#fef2f2',
+          100: '#fee2e2',
+          200: '#fecaca',
+          300: '#fca5a5',
+          400: '#f87171',
+          500: '#ef4444',
+          600: '#dc2626',
+          700: '#B6150A', // Main deep red
+          800: '#991b1b',
+          900: '#7f1d1d',
+        },
+        // Legacy Gemini colors (keep for backward compatibility, will phase out)
         gemini: {
           cyan: '#06B6D4',
           'cyan-light': '#22D3EE',

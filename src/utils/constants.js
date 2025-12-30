@@ -41,8 +41,8 @@ export const API_ENDPOINTS = {
 // App Configuration
 // ============================================
 
-export const APP_NAME = 'RuangTamu';
-export const APP_TAGLINE = 'by PutuWistika';
+export const APP_NAME = 'Baleda';
+export const APP_TAGLINE = 'Digital Guest Reception Platform';
 export const APP_VERSION = '1.0.0';
 
 // ============================================

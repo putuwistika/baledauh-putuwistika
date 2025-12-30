@@ -348,9 +348,9 @@
     @apply bg-white/80 backdrop-blur-lg border border-white/20;
   }
 
-  /* Gemini Gradient Text */
+  /* Baleda Brand Gradient Text - Ceremonial Gold to Deep Green */
   .gradient-text {
-    background: linear-gradient(135deg, #06B6D4 0%, #3B82F6 33%, #8B5CF6 66%, #C026D3 100%);
+    background: linear-gradient(135deg, #E1A847 0%, #d49435 25%, #587a4a 75%, #32491E 100%);
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -358,7 +358,21 @@
     animation: gradient-shift 3s ease-in-out infinite;
   }
 
-  /* Gemini Gradient Background */
+  /* Baleda Brand Gradient Background - Warm Gold to Deep Green */
+  .gradient-baleda {
+    background: linear-gradient(135deg, #E1A847 0%, #d49435 40%, #587a4a 80%, #32491E 100%);
+  }
+
+  .gradient-baleda-hover {
+    background: linear-gradient(135deg, #efc97f 0%, #E1A847 40%, #7a9a6b 80%, #435e38 100%);
+  }
+
+  /* Baleda Subtle Background - Soft whites with gold accent */
+  .gradient-baleda-soft {
+    background: linear-gradient(135deg, #ffffff 0%, #fdf8f0 50%, #faf0dc 100%);
+  }
+
+  /* Legacy Gemini Gradient (keeping for backward compatibility) */
   .gradient-gemini {
     background: linear-gradient(135deg, #06B6D4 0%, #3B82F6 33%, #8B5CF6 66%, #C026D3 100%);
   }
@@ -372,7 +386,21 @@
     @apply bg-white/80 backdrop-blur-lg border border-white/40 shadow-xl;
   }
 
-  /* Gemini Shadow Utilities */
+  /* Baleda Shadow Utilities - Ceremonial Gold glow */
+  .shadow-baleda {
+    box-shadow: 0 10px 40px -10px rgba(225, 168, 71, 0.3),
+                0 5px 20px -5px rgba(50, 73, 30, 0.2);
+  }
+
+  .shadow-gold {
+    box-shadow: 0 4px 20px 0 rgba(225, 168, 71, 0.25), 0 2px 10px 0 rgba(212, 148, 53, 0.15);
+  }
+
+  .shadow-green {
+    box-shadow: 0 4px 20px 0 rgba(50, 73, 30, 0.2), 0 2px 10px 0 rgba(67, 94, 56, 0.15);
+  }
+
+  /* Legacy Gemini Shadow Utilities (keeping for backward compatibility) */
   .shadow-primary {
     box-shadow: 0 4px 20px 0 rgba(6, 182, 212, 0.3), 0 2px 10px 0 rgba(59, 130, 246, 0.2);
   }
